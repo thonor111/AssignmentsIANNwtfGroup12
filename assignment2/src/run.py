@@ -96,23 +96,23 @@ and_accuracies, and_losses = train_on_connective(and_mlp, 1000, target_and)
 or_accuracies, or_losses = train_on_connective(or_mlp, 1000, target_or)
 nor_accuracies, nor_losses = train_on_connective(nor_mlp, 1000, target_nor)
 nand_accuracies, nand_losses = train_on_connective(nand_mlp, 1000, target_nand)
-nor_accuracies, nor_losses = train_on_connective(xor_mlp, 1000, target_xor)
+xor_accuracies, xor_losses = train_on_connective(xor_mlp, 1000, target_xor)
 
 # visualize 
 visualize("and", "loss", np.arange(len(and_losses)), and_losses)
-visualize("and", "loss", np.arange(len(and_losses)), and_losses)
+visualize("and", "accuracy", np.arange(len(and_accuracies)), and_accuracies)
 
-visualize("and", "loss", np.arange(len(and_losses)), and_losses)
-visualize("and", "loss", np.arange(len(and_losses)), and_losses)
+visualize("or", "loss", np.arange(len(or_losses)), or_losses)
+visualize("or", "accuracy", np.arange(len(or_accuracies)), or_accuracies)
 
-visualize("and", "loss", np.arange(len(and_losses)), and_losses)
-visualize("and", "loss", np.arange(len(and_losses)), and_losses)
+visualize("nand", "loss", np.arange(len(nand_losses)), nand_losses)
+visualize("nand", "accuracy", np.arange(len(nand_accuracies)), nand_accuracies)
 
-visualize("and", "loss", np.arange(len(and_losses)), and_losses)
-visualize("and", "loss", np.arange(len(and_losses)), and_losses)
+visualize("nor", "loss", np.arange(len(nor_losses)), nor_losses)
+visualize("nor", "accuracy", np.arange(len(nor_accuracies)), nor_accuracies)
 
-visualize("and", "loss", np.arange(len(and_losses)), and_losses)
-visualize("and", "loss", np.arange(len(and_losses)), and_losses)
+visualize("xor", "loss", np.arange(len(xor_losses)), xor_losses)
+visualize("xor", "accuracy", np.arange(len(xor_accuracies)), xor_accuracies)
 
 
 
