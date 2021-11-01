@@ -9,7 +9,7 @@ from numpy.core.fromnumeric import mean
 from MLP import MLP
 from matplotlib import pyplot as plt
 
-def train_on_connective(mlp, num_epochs, target_values):
+def train_on_connective(mlp, epochs, target_values):
     '''
         Trains the MLP for the given connective
 
@@ -27,7 +27,6 @@ def train_on_connective(mlp, num_epochs, target_values):
                         average squared error losses for each training epoch
         '''
 
-    epochs = num_epochs
     epoch_accuracy = []
     epoch_squared_error_loss = []
 
@@ -39,7 +38,7 @@ def train_on_connective(mlp, num_epochs, target_values):
         for i, datapoint in enumerate(data):
 
             output = mlp.forward_step(datapoint)
-            mlp.backprop_step(target_and[i])
+            mlp.backprop_step(target_values[i])
 
             avg_squared_error_loss += (target_values[i] - output)**2
             
@@ -91,12 +90,14 @@ nor_mlp = MLP()
 nand_mlp = MLP()
 xor_mlp = MLP()
 
+epochs = 1000
+
 # train the MLPs on their respective connective
-and_accuracies, and_losses = train_on_connective(and_mlp, 1000, target_and)
-or_accuracies, or_losses = train_on_connective(or_mlp, 1000, target_or)
-nor_accuracies, nor_losses = train_on_connective(nor_mlp, 1000, target_nor)
-nand_accuracies, nand_losses = train_on_connective(nand_mlp, 1000, target_nand)
-xor_accuracies, xor_losses = train_on_connective(xor_mlp, 1000, target_xor)
+and_accuracies, and_losses = train_on_connective(and_mlp, epochs, target_and)
+or_accuracies, or_losses = train_on_connective(or_mlp, epochs, target_or)
+nor_accuracies, nor_losses = train_on_connective(nor_mlp, epochs, target_nor)
+nand_accuracies, nand_losses = train_on_connective(nand_mlp, epochs, target_nand)
+xor_accuracies, xor_losses = train_on_connective(xor_mlp, epochs, target_xor)
 
 # visualize 
 visualize("and", "loss", np.arange(len(and_losses)), and_losses)
