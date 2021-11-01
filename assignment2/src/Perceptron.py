@@ -89,7 +89,7 @@ class Perceptron():
         for i, weight in enumerate(self.weights):
 
             delta_weights[i] = gradient * self.inputs[i]
-            self.weights[i] = weight - self.alpha * delta_weights[i]
+            self.weights[i] = weight - delta_weights[i]
 
-        self.bias = self.bias - self.alpha * gradient
+        self.bias = self.bias - gradient
     
