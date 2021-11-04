@@ -3,7 +3,7 @@
 """
 Multilayer Perceptron
 
-@authors: lmcdonald, hsanna
+@authors: lmcdonald, hsanna, tnortmann
 """
 
 import numpy as np

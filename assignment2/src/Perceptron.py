@@ -3,7 +3,7 @@
 """
 Single Perceptron
 
-@authors: lmcdonald
+@authors: lmcdonald, hsanna, tnortmann
 """
 
 import numpy as np

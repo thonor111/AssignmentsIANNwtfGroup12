@@ -3,7 +3,7 @@
 """
 Activation Functions and their primes
 
-@authors: lmcdonald
+@authors: lmcdonald, hsanna, tnortmann
 """
 
 import math

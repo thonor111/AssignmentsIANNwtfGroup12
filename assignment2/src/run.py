@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-@authors: lmcdonald hsanna
+@authors: lmcdonald, hsanna, tnortmann
 """
 
 import numpy as np
