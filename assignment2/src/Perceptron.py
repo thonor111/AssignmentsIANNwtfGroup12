@@ -39,7 +39,7 @@ class Perceptron():
         '''
         Initializes a Perceptron.
 
-            Parameters :
+            Args :
                     input_units (int) :
                         number of weights reaching the perceptron
                     alpha (float) :
@@ -60,7 +60,7 @@ class Perceptron():
         Calculates the activation of the perceptron using the sigmoid
         activation function.
 
-            Parameters :
+            Args :
                     inputs (array) : Inputs to the perceptron
 
             Returns :
@@ -79,7 +79,7 @@ class Perceptron():
         Computes gradients for weights and bias from error term delta
         and updates the parameters accordingly.
 
-            Parameters :
+            Args :
                     delta (float) : error term from previous layer
         '''
 

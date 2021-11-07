@@ -46,7 +46,7 @@ class MLP():
         '''
         Passes the inputs through the network.
 
-            Parameters :
+            Args :
                     inputs (array) :
                         input data
             Returns : 
@@ -71,7 +71,7 @@ class MLP():
         '''
         One backpropagation pass through the MLP, updating the weights and biases.
 
-            Parameters :
+            Args :
                     target (int) :
                         target output
         '''

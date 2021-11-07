@@ -13,7 +13,7 @@ def sigmoid(x):
         Sigmoid activation function.
         Formula: 𝜎(𝑥)=1/(1+𝑒^(−𝑥))
 
-            Parameters : 
+            Args : 
                 x (float) : input value
 
             Returns :
@@ -28,7 +28,7 @@ def sigmoidprime(x):
         Derivative of sigmoid activation function.
         Formula: 𝜎(𝑥)⋅(1−𝜎(𝑥))
 
-            Parameters : 
+            Args : 
                 x (float) : input value
 
             Returns :

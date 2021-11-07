@@ -13,7 +13,7 @@ def train_on_connective(mlp, epochs, target_values):
     '''
         Trains the MLP for the given connective
 
-            Parameters :
+            Args :
                     mlp (MLP) :
                         the multilayer perceptron to be trained
                     num_epochs (int) :
@@ -55,7 +55,7 @@ def visualize(logical_connective, evaluation_metric, epochs, epoch_evaluations):
     '''
         Visualizes an evaluation metric against the epochs for a given connective
 
-            Parameters :
+            Args :
                     logical_connective (string) :
                         the label of the plot; connective of choice
                     evaluation_metric (string) :
