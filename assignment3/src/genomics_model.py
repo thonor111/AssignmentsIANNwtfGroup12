@@ -25,6 +25,9 @@ class GenomicsModel(tf.keras.Model):
 
     # initialize model with two hidden layers and one output layer
     def __init__(self):
+        '''
+            Initializes hidden and output layers of the model
+        '''
 
         super(GenomicsModel, self).__init__()
 
@@ -33,11 +36,21 @@ class GenomicsModel(tf.keras.Model):
 
         self.output_layer = GenomicsDenseLayer(10, activation = tf.nn.softmax)
 
-    # forward step
+    # forward step, calculate prediction
     def call(self, inputs):
+        '''
+            Forward Step
+            Passes activations through the network and calculates prediction
+
+            Args:
+                inputs: the inputs to the model
+
+            Returns:
+                y: the prediction of the model
+        '''
 
         x = self.hidden_1(inputs)
         x = self.hidden_2(x)
-        x = self.output_layer(x)
+        y = self.output_layer(x)
 
-        return x
+        return y
