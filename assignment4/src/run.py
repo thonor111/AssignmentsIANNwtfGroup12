@@ -7,11 +7,18 @@ import tensorflow_datasets as tfds
 import input_pipeline, training_loop
 from genomics_model import GenomicsModel
 import matplotlib.pyplot as plt
+import pandas as pd
 
 tf.keras.backend.clear_session()
 
 # load dataset and split into to train (100,000 examples) and test (1,000 examples) sets
-train_data, test_data = tfds.load('genomics_ood', split=['train[:10%]', 'test[:1%]'], as_supervised=True)
+url = "https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv"
+data = pd.read_csv(url)
+print(type(data))
+train_data = data
+test_data = data
+
+#train_data, test_data = tfds.load('genomics_ood', split=['train[:10%]', 'test[:1%]'], as_supervised=True)
 
 # apply input pipeline to train and test dataset splits
 train_data = train_data.apply(input_pipeline.prepare_data)

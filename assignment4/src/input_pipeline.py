@@ -3,37 +3,38 @@ authors: tnortmann, hsanna, lmcdonald
 '''
 
 import tensorflow as tf
+import numpy as np
 
-def genome_onehot(tensor):
+
+def make_binary(target):
     '''
-        Converts the string tensor containing the genome's categorical bases
-        into a one-hot feature
-
-        Args:
-            tensor: string tensor coding the bases of the genome
-
-        Returns:
-            onehot: the one-hot encoding of the bases
+    transforms the given metric target to binary values
     '''
+    # according to the website we got the dataset from the target can have values between 0 and 10 so we used 5 as a threshold
+    # actually, this dataset only has values from 3 to 8 so we included 5 in the values mapped to 0
+    return int(target > 5)
 
-    # dictionary that maps each base in genome string to an int value between 0 and 3
-    base_value_map = {"A" : "0", "C" : "1", "G" : "2", "T" : "3"}
+def create_tf_dataset(data):
+    '''
+    splits the given data into input and target and turns it into a tf dataset
+    '''
+    # every column but the last are inputs (turning it to a numpy array automatically removes the indices and labels)
+    inputs = np.array(data)[:, :-1]
 
-    # replace 'base' chars with 'value' digits
-    for base, value in base_value_map.items():
-        tensor = tf.strings.regex_replace(tensor, base, value)
+    # The last column, "quality", is our target -> We want to learn which wine has a good quality
+    targets = np.array(data["quality"])
 
-    # retrieve bytes from the respective string
-    # retrieve ints from the respective bytes
-    split = tf.strings.bytes_split(tensor)
-    labels = tf.cast(tf.strings.to_number(split), tf.uint8)
+    # creating the tf dataset
+    dataset = tf.data.Dataset.from_tensor_slices((inputs, targets))
+    # shuffling before splitting to have all targets in training and testing dataset
+    dataset = dataset.shuffle(100, seed = 42)
 
-    # convert into one-hot tensors: [[0,0,0,1], ..., [0,0,1,0]]
-    # reshape one-hot tensors: [0,0,0,1,...,0,0,1,0]
-    onehot = tf.one_hot(labels, 4)
-    onehot = tf.reshape(onehot, (-1,))
+    # splitting training and testing set
+    training_set = dataset.take(1400)
+    dataset = dataset.skip(1400)
+    testing_set = dataset.take(199)
 
-    return onehot
+    return training_set, testing_set
 
 def prepare_data(data):
     '''
@@ -47,14 +48,11 @@ def prepare_data(data):
             data: the prepared tf dataset
     '''
 
-    # turn sequence and labels into one-hot vectors
-    data = data.map(lambda x,y: (genome_onehot(x),tf.reshape(tf.one_hot(y, depth = 10), (-1,))))
+    # make binary
+    data = data.map(lambda input, target: (input, make_binary(target)))
 
     # cache
     data = data.cache()
-
-    # shuffle
-    data = data.shuffle(1000, reshuffle_each_iteration = True, seed = 42)
 
     # batch
     data = data.batch(10)
