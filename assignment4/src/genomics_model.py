@@ -31,10 +31,10 @@ class GenomicsModel(tf.keras.Model):
 
         super(GenomicsModel, self).__init__()
 
-        self.hidden_1 = GenomicsDenseLayer(256, activation = tf.math.sigmoid)
-        self.hidden_2 = GenomicsDenseLayer(256, activation = tf.math.sigmoid)
+        self.hidden_1 = GenomicsDenseLayer(50, activation_function = tf.math.sigmoid)
+        self.hidden_2 = GenomicsDenseLayer(50, activation_function = tf.math.sigmoid)
 
-        self.output_layer = GenomicsDenseLayer(10, activation = tf.nn.softmax)
+        self.output_layer = GenomicsDenseLayer(1, activation_function = tf.nn.softmax)
 
     # forward step, calculate prediction
     def call(self, inputs):

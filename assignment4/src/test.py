@@ -12,10 +12,10 @@ tf.keras.backend.clear_session()
 url = "https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv"
 data = pd.read_csv(url, sep = ';')
 
-training_set, testing_set = input_pipeline.create_tf_dataset(data)
-training_set = input_pipeline.prepare_data(training_set)
-testing_set = input_pipeline.prepare_data(testing_set)
-head = training_set.take(5)
+train_data, test_data = input_pipeline.create_tf_dataset(data)
+train_data = input_pipeline.prepare_data(train_data)
+test_data = input_pipeline.prepare_data(test_data)
+head = train_data.take(5)
 for elem in head:
     print(elem)
 

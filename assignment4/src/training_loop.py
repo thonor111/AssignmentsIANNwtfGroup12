@@ -50,7 +50,9 @@ def test(model, test_data, loss_function):
   for (input, target) in test_data:
     prediction = model(input)
     sample_test_loss = loss_function(target, prediction)
-    sample_test_accuracy =  np.argmax(target, axis=1) == np.argmax(prediction, axis=1)
+    prediction = tf.round(prediction)
+    prediction = tf.cast(prediction, tf.int32)
+    sample_test_accuracy =  tf.math.equal(prediction, target)
     sample_test_accuracy = np.mean(sample_test_accuracy)
     test_loss_aggregator.append(sample_test_loss.numpy())
     test_accuracy_aggregator.append(np.mean(sample_test_accuracy))
