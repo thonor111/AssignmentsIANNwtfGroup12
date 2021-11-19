@@ -3,9 +3,9 @@
 '''
 
 import tensorflow as tf
-from genomics_dense_layer import GenomicsDenseLayer
+from wine_dense_layer import WineDenseLayer
 
-class GenomicsModel(tf.keras.Model):
+class WineModel(tf.keras.Model):
     '''
     Custom Model subclassing from tf.keras.Model
 
@@ -18,9 +18,9 @@ class GenomicsModel(tf.keras.Model):
 
         Attributes
         ----------
-        hidden_1 : GenomicsDenseLayer
-        hidden_2 : GenomicsDenseLayer
-        output_layer : GenomicsDenseLayer
+        hidden_1 : WineDenseLayer
+        hidden_2 : WineDenseLayer
+        output_layer : WineDenseLayer
     '''
 
     # initialize model with two hidden layers and one output layer
@@ -29,12 +29,12 @@ class GenomicsModel(tf.keras.Model):
             Initializes hidden and output layers of the model
         '''
 
-        super(GenomicsModel, self).__init__()
+        super(WineModel, self).__init__()
 
-        self.hidden_1 = GenomicsDenseLayer(50, activation_function = tf.math.sigmoid)
-        self.hidden_2 = GenomicsDenseLayer(50, activation_function = tf.math.sigmoid)
+        self.hidden_1 = WineDenseLayer(20, activation_function = tf.keras.activations.sigmoid)
+        self.hidden_2 = WineDenseLayer(20, activation_function = tf.keras.activations.sigmoid)
 
-        self.output_layer = GenomicsDenseLayer(1, activation_function = tf.nn.softmax)
+        self.output_layer = WineDenseLayer(1, activation_function = tf.keras.activations.sigmoid)
 
     # forward step, calculate prediction
     def call(self, inputs):

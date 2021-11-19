@@ -3,12 +3,10 @@ authors: tnortmann, hsanna, lmcdonald
 '''
 
 import tensorflow as tf
-import tensorflow_datasets as tfds
 import input_pipeline, training_loop
-from genomics_model import GenomicsModel
+from wine_model import WineModel
 import matplotlib.pyplot as plt
 import pandas as pd
-import numpy as np
 
 tf.keras.backend.clear_session()
 
@@ -31,13 +29,13 @@ num_epochs = 10
 alpha = 0.1
 
 # Initialize Model
-model = GenomicsModel()
+model = WineModel()
 
 # loss function
-cat_cross_entropy = tf.keras.losses.CategoricalCrossentropy()
+mean_squared_error = tf.keras.losses.MeanSquaredError()
 
 # stochastic gradient descent optimizer
-sgd_optimizer = tf.keras.optimizers.SGD(alpha)
+sgd_optimizer = tf.keras.optimizers.Adam(alpha, beta_1 = 0.8, beta_2 = 0.99 )
 
 # Initialize lists for later visualization.
 train_losses = []
@@ -45,12 +43,12 @@ test_losses = []
 test_accuracies = []
 
 # testing once before we begin
-test_loss, test_accuracy = training_loop.test(model, test_data, cat_cross_entropy)
+test_loss, test_accuracy = training_loop.test(model, test_data, mean_squared_error)
 test_losses.append(test_loss)
 test_accuracies.append(test_accuracy)
 
 # check how model performs on train data once before we begin
-train_loss, _ = training_loop.test(model, test_data, cat_cross_entropy)
+train_loss, _ = training_loop.test(model, test_data, mean_squared_error)
 train_losses.append(train_loss)
 
 # We train for num_epochs epochs.
@@ -62,16 +60,17 @@ for epoch in range(num_epochs):
     # training (and checking in with training)
     epoch_loss_agg = []
     for input,target in train_data:
-        train_loss = training_loop.train_step(model, input, target, cat_cross_entropy, sgd_optimizer)
+        train_loss = training_loop.train_step(model, input, target, mean_squared_error, sgd_optimizer)
         epoch_loss_agg.append(train_loss)
     
     # track training loss
     train_losses.append(tf.reduce_mean(epoch_loss_agg))
 
     # testing, so we can track accuracy and test loss
-    test_loss, test_accuracy = training_loop.test(model, test_data, cat_cross_entropy)
+    test_loss, test_accuracy = training_loop.test(model, test_data, mean_squared_error)
     test_losses.append(test_loss)
     test_accuracies.append(test_accuracy)
+
 
 # Visualize accuracy and loss for training and test data.
 plt.figure()

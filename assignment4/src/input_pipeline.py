@@ -27,7 +27,7 @@ def create_tf_dataset(data):
     # creating the tf dataset
     dataset = tf.data.Dataset.from_tensor_slices((inputs, targets))
     # shuffling before splitting to have all targets in training and testing dataset
-    dataset = dataset.shuffle(100, seed = 42)
+    dataset = dataset.shuffle(100)
 
     # splitting training and testing set
     training_set = dataset.take(1400)
@@ -55,7 +55,7 @@ def prepare_data(data):
     data = data.cache()
 
     # batch
-    data = data.batch(10)
+    data = data.batch(50)
 
     # prefetch
     data = data.prefetch(20)

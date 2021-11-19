@@ -4,7 +4,7 @@
 
 import tensorflow as tf
 
-class GenomicsDenseLayer(tf.keras.layers.Layer):
+class WineDenseLayer(tf.keras.layers.Layer):
     '''
         Custom Dense Layer subclassing from tf.keras.layers.Layer
 
@@ -26,7 +26,7 @@ class GenomicsDenseLayer(tf.keras.layers.Layer):
                 activation_function: the activation function to be used in the layer
         '''
 
-        super(GenomicsDenseLayer, self).__init__()
+        super(WineDenseLayer, self).__init__()
 
         self.units = units
         self.activation_function = activation_function
