@@ -27,12 +27,13 @@ def create_tf_dataset(data):
     # creating the tf dataset
     dataset = tf.data.Dataset.from_tensor_slices((inputs, targets))
     # shuffling before splitting to have all targets in training and testing dataset
-    dataset = dataset.shuffle(100)
+    dataset = dataset.shuffle(1000)
 
     # splitting training and testing set
     training_set = dataset.take(1400)
     dataset = dataset.skip(1400)
     testing_set = dataset.take(199)
+
 
     return training_set, testing_set
 
@@ -50,6 +51,9 @@ def prepare_data(data):
 
     # make binary
     data = data.map(lambda input, target: (input, make_binary(target)))
+
+    # shuffle
+    data = data.shuffle(1000, reshuffle_each_iteration = True)
 
     # cache
     data = data.cache()

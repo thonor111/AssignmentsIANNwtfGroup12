@@ -4,6 +4,7 @@
 
 import tensorflow as tf
 from wine_dense_layer import WineDenseLayer
+import numpy as np
 
 class WineModel(tf.keras.Model):
     '''
@@ -24,20 +25,22 @@ class WineModel(tf.keras.Model):
     '''
 
     # initialize model with two hidden layers and one output layer
-    def __init__(self):
+    def __init__(self, p_gaussian_dropout):
         '''
             Initializes hidden and output layers of the model
         '''
 
         super(WineModel, self).__init__()
 
-        self.hidden_1 = WineDenseLayer(20, activation_function = tf.keras.activations.sigmoid)
-        self.hidden_2 = WineDenseLayer(20, activation_function = tf.keras.activations.sigmoid)
+        self.hidden_1 = WineDenseLayer(80, activation_function = tf.keras.activations.sigmoid)
+        self.hidden_2 = WineDenseLayer(80, activation_function = tf.keras.activations.sigmoid)
 
         self.output_layer = WineDenseLayer(1, activation_function = tf.keras.activations.sigmoid)
 
+        self.std_layers = np.sqrt((1 - p_gaussian_dropout) / p_gaussian_dropout)
+
     # forward step, calculate prediction
-    def call(self, inputs):
+    def call(self, inputs, dropout = True):
         '''
             Forward Step
             Passes activations through the network and calculates prediction
@@ -49,8 +52,8 @@ class WineModel(tf.keras.Model):
                 y: the prediction of the model
         '''
 
-        x = self.hidden_1(inputs)
-        x = self.hidden_2(x)
-        y = self.output_layer(x)
+        x = self.hidden_1(inputs, self.std_layers, dropout = dropout)
+        x = self.hidden_2(x, self.std_layers, dropout = dropout)
+        y = self.output_layer(x, self.std_layers, dropout = dropout)
 
         return y

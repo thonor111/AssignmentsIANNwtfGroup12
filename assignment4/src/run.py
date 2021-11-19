@@ -27,15 +27,17 @@ test_data = test_data.apply(input_pipeline.prepare_data)
 # Hyperparameters
 num_epochs = 10
 alpha = 0.1
+p_gaussian_dropout = 0.5
 
 # Initialize Model
-model = WineModel()
+model = WineModel(p_gaussian_dropout)
 
 # loss function
 mean_squared_error = tf.keras.losses.MeanSquaredError()
 
 # stochastic gradient descent optimizer
-sgd_optimizer = tf.keras.optimizers.Adam(alpha, beta_1 = 0.8, beta_2 = 0.99 )
+#sgd_optimizer = tf.keras.optimizers.Adam(alpha, beta_1 = 0.8, beta_2 = 0.99 )
+sgd_optimizer = tf.keras.optimizers.Adagrad(alpha)
 
 # Initialize lists for later visualization.
 train_losses = []

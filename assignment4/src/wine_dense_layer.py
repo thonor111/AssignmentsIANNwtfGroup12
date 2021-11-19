@@ -50,7 +50,7 @@ class WineDenseLayer(tf.keras.layers.Layer):
                                initializer='random_normal',
                                trainable=True)
 
-    def call(self, inputs): 
+    def call(self, inputs, std, dropout):
         '''
         Forward Step
         Calculates the layer's activation
@@ -64,5 +64,7 @@ class WineDenseLayer(tf.keras.layers.Layer):
 
         x = tf.matmul(inputs, self.w) + self.b
         x = self.activation_function(x)
+        if dropout:
+            x = x * tf.random.normal(shape = (), mean = 0, stddev = std)
 
         return x
