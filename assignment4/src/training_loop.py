@@ -22,7 +22,7 @@ def train_step(model, input, target, loss_function, optimizer):
 
   # loss_object and optimizer_object are instances of respective tensorflow classes
   with tf.GradientTape() as tape:
-    prediction = model(input, dropout = True)
+    prediction = model(input, dropout = False)
     loss = loss_function(target, prediction)
   gradients = tape.gradient(loss, model.trainable_variables)
 
