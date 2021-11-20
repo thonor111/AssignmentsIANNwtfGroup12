@@ -14,12 +14,22 @@ def make_binary(target):
     # actually, this dataset only has values from 3 to 8 so we included 5 in the values mapped to 0
     return int(target > 5)
 
+def unify(input):
+    output = []
+    for column_index in range(input.shape[1]):
+        column = input[:, column_index]
+        column = np.divide((column - column.min()), (column.max() - column.min()))
+        output.append(column)
+    return np.array(output).T
+
 def create_tf_dataset(data):
     '''
     splits the given data into input and target and turns it into a tf dataset
     '''
     # every column but the last are inputs (turning it to a numpy array automatically removes the indices and labels)
     inputs = np.array(data)[:, :-1]
+
+    inputs = unify(inputs)
 
     # The last column, "quality", is our target -> We want to learn which wine has a good quality
     targets = np.array(data["quality"])

@@ -32,8 +32,8 @@ class WineModel(tf.keras.Model):
 
         super(WineModel, self).__init__()
 
-        self.hidden_1 = WineDenseLayer(5, activation_function = tf.keras.activations.sigmoid)
-        self.hidden_2 = WineDenseLayer(5, activation_function = tf.keras.activations.sigmoid)
+        self.hidden_1 = WineDenseLayer(10, activation_function = tf.keras.activations.sigmoid)
+        self.hidden_2 = WineDenseLayer(10, activation_function = tf.keras.activations.sigmoid)
 
         self.output_layer = WineDenseLayer(1, activation_function = tf.keras.activations.sigmoid)
 

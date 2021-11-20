@@ -7,39 +7,37 @@ import input_pipeline, training_loop
 from wine_model import WineModel
 import matplotlib.pyplot as plt
 import pandas as pd
-from Models import MyModel
-import datapipeline
 
 tf.keras.backend.clear_session()
-#
-# # load dataset and split into to train (1400 examples) and test (199 examples) sets
-# url = "https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv"
-# data = pd.read_csv(url, sep = ';')
-# train_data, test_data = input_pipeline.create_tf_dataset(data)
-#
-#
-# #train_data = input_pipeline.prepare_data(train_data)
-# #test_data = input_pipeline.prepare_data(test_data)
-#
-#
-# # apply input pipeline to train and test dataset splits
-# train_data = train_data.apply(input_pipeline.prepare_data)
-# test_data = test_data.apply(input_pipeline.prepare_data)
 
-#Readind the data in a pandas dataframe with ; as a separator
-wine_quality = pd.read_csv("winequality-red.csv", ";")
+# load dataset and split into to train (1400 examples) and test (199 examples) sets
+url = "https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/winequality-red.csv"
+data = pd.read_csv(url, sep = ';')
+train_data, test_data = input_pipeline.create_tf_dataset(data)
 
-#Datapipeline: splitting the dataset, target for a binary classification
-train_data, test_data, validate_input = datapipeline.data_pipeline(wine_quality)
+
+#train_data = input_pipeline.prepare_data(train_data)
+#test_data = input_pipeline.prepare_data(test_data)
+
+
+# apply input pipeline to train and test dataset splits
+train_data = train_data.apply(input_pipeline.prepare_data)
+test_data = test_data.apply(input_pipeline.prepare_data)
+
+# #Readind the data in a pandas dataframe with ; as a separator
+# wine_quality = pd.read_csv("winequality-red.csv", ";")
+#
+# #Datapipeline: splitting the dataset, target for a binary classification
+# train_data, test_data, validate_input = datapipeline.data_pipeline(wine_quality)
 
 # Hyperparameters
-num_epochs = 10
+num_epochs = 20
 alpha = 0.1
 p_gaussian_dropout = 0.5
 
 # Initialize Model
-#model = WineModel(p_gaussian_dropout)
-model = MyModel()
+model = WineModel(p_gaussian_dropout)
+# model = MyModel()
 
 # loss function
 binary_crossentropy_loss = tf.keras.losses.BinaryCrossentropy()
