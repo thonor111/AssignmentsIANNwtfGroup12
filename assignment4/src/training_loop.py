@@ -47,13 +47,9 @@ def test(model, test_data, loss_function):
   test_loss_aggregator = []
 
   for (input, target) in test_data:
-    #print("target", target)
     prediction = model(input, training = False)
     sample_test_loss = loss_function(target, prediction)
-    #print("prediction", prediction)
     prediction = tf.round(prediction)
-    #print("prediction", prediction)
-    #print("target", target)
     prediction = tf.cast(prediction, tf.int32)
     sample_test_accuracy =  tf.math.equal(prediction, target)
     sample_test_accuracy = np.mean(sample_test_accuracy)

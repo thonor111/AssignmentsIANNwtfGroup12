@@ -34,9 +34,6 @@ class Model(tf.keras.Model):
         self.hidden_1 = tf.keras.layers.Dense(128, activation = tf.math.sigmoid, kernel_regularizer = "l2")
         self.hidden_2 = tf.keras.layers.Dense(128, activation = tf.math.sigmoid, kernel_regularizer = "l2")
 
-        # self.hidden_1 = tf.keras.layers.Dense(128, activation = tf.math.sigmoid)
-        # self.hidden_2 = tf.keras.layers.Dense(128, activation = tf.math.sigmoid)
-
         # binary output layer
         self.output_layer = tf.keras.layers.Dense(1, activation = tf.nn.sigmoid)
 
@@ -58,7 +55,6 @@ class Model(tf.keras.Model):
         x = self.hidden_1(inputs)
         x = self.dropout_layer(x, training = training)
         x = self.hidden_2(x)
-        #x = self.dropout_layer(x)
         y = self.output_layer(x)
 
         return y

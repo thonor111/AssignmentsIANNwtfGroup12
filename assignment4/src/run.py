@@ -18,11 +18,6 @@ max_vals = dataset.max()
 min_vals = dataset.min()
 dataset.iloc[:,:-2] = ( dataset.iloc[:,:-2] - dataset.iloc[:,:-2].min() ) / ( dataset.iloc[:,:-2].max() - dataset.iloc[:,:-2].min() )
 
-# OPTIONAL
-# check to take a look at the shape of the dataset
-#print(dataset.info())
-#print(dataset.head())
-
 # split dataset into train, validation and test sets
 train_data = dataset.sample(frac = 0.6, random_state = 1)
 validation_data = dataset.drop(train_data.index).sample(frac = 0.5, random_state = 1)
@@ -39,7 +34,6 @@ validation_input = validation_data.drop(columns=['quality'], axis=1)
 validation_labels = validation_data.drop(validation_input.columns, axis=1)
 test_input = test_data.drop(columns=['quality'], axis=1)
 test_labels = test_data.drop(test_input.columns, axis=1)
-#print(labels.head())
 
 train_ds = tf.data.Dataset.from_tensor_slices((train_input, train_labels))
 train_ds_np = tfds.as_numpy(train_ds)
@@ -47,8 +41,6 @@ validation_ds = tf.data.Dataset.from_tensor_slices((validation_input, validation
 validation_ds_np = tfds.as_numpy(validation_ds)
 test_ds = tf.data.Dataset.from_tensor_slices((test_input, test_labels))
 test_ds_np = tfds.as_numpy(test_ds)
-# for data in test_ds_np:
-#     print(data)
 
 # apply input pipeline to train and test dataset splits
 train_ds = train_ds.apply(input_pipeline.prepare_data)
@@ -66,7 +58,7 @@ model = Model()
 loss_function = tf.keras.losses.BinaryCrossentropy()
 
 # vanilla SGD
-optimizer = tf.keras.optimizers.SGD(learning_rate = alpha)
+#optimizer = tf.keras.optimizers.SGD(learning_rate = alpha)
 # SGD with momentum
 #optimizer = tf.keras.optimizers.SGD(learning_rate = alpha, momentum = 0.2)
 # SGD with Nesterov
@@ -75,7 +67,7 @@ optimizer = tf.keras.optimizers.SGD(learning_rate = alpha)
 #optimizer = tf.keras.optimizers.SGD(learning_rate = alpha, momentum = 0.2, nesterov = True)
 
 # ADAM optimizer
-#optimizer = tf.keras.optimizers.Adam(learning_rate = alpha)
+optimizer = tf.keras.optimizers.Adam(learning_rate = alpha)
 
 # Initialize lists for later visualization.
 train_losses = []
