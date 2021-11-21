@@ -39,7 +39,7 @@ def prepare_data(data):
     '''
 
     #
-    data = data.map(lambda input, target: (input, make_binary(target[0])))
+    data = data.map(lambda input, target: (input, make_binary(target)))
 
     # cache
     data = data.cache()
@@ -48,7 +48,7 @@ def prepare_data(data):
     data = data.shuffle(1000, reshuffle_each_iteration = True, seed = 42)
 
     # batch
-    data = data.batch(10)
+    data = data.batch(12)
 
     # prefetch
     data = data.prefetch(20)

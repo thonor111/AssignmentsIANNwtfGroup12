@@ -34,13 +34,16 @@ class Model(tf.keras.Model):
         self.hidden_1 = tf.keras.layers.Dense(128, activation = tf.math.sigmoid, kernel_regularizer = "l2")
         self.hidden_2 = tf.keras.layers.Dense(128, activation = tf.math.sigmoid, kernel_regularizer = "l2")
 
+        # self.hidden_1 = tf.keras.layers.Dense(128, activation = tf.math.sigmoid)
+        # self.hidden_2 = tf.keras.layers.Dense(128, activation = tf.math.sigmoid)
+
         # binary output layer
         self.output_layer = tf.keras.layers.Dense(1, activation = tf.nn.sigmoid)
 
-        self.dropout_layer = tf.keras.layers.Dropout(rate = 0.2)
+        self.dropout_layer = tf.keras.layers.Dropout(rate = 0.1)
 
     # forward step, calculate prediction
-    def call(self, inputs):
+    def call(self, inputs, training):
         '''
             Forward Step
             Passes activations through the network and calculates prediction
@@ -53,9 +56,9 @@ class Model(tf.keras.Model):
         '''
 
         x = self.hidden_1(inputs)
-        x = self.dropout_layer(x)
+        x = self.dropout_layer(x, training = training)
         x = self.hidden_2(x)
-        x = self.dropout_layer(x)
+        #x = self.dropout_layer(x)
         y = self.output_layer(x)
 
         return y

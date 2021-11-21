@@ -22,7 +22,7 @@ def train_step(model, input, target, loss_function, optimizer):
 
   # loss_object and optimizer_object are instances of respective tensorflow classes
   with tf.GradientTape() as tape:
-    prediction = model(input)
+    prediction = model(input, training = True)
     loss = loss_function(target, prediction)
     gradients = tape.gradient(loss, model.trainable_variables)
 
@@ -43,20 +43,21 @@ def test(model, test_data, loss_function):
       test_loss: model's loss on the test set
       test_accuracy: model's accuracy on the test set
   '''
-  model.dropout_layer = tf.keras.layers.Dropout(rate = 0)
   test_accuracy_aggregator = []
   test_loss_aggregator = []
 
   for (input, target) in test_data:
     #print("target", target)
-    prediction = model(input)
+    prediction = model(input, training = False)
     sample_test_loss = loss_function(target, prediction)
+    #print("prediction", prediction)
     prediction = tf.round(prediction)
     #print("prediction", prediction)
+    #print("target", target)
     prediction = tf.cast(prediction, tf.int32)
     sample_test_accuracy =  tf.math.equal(prediction, target)
     sample_test_accuracy = np.mean(sample_test_accuracy)
-    test_loss_aggregator.append(sample_test_loss.numpy())
+    test_loss_aggregator.append(sample_test_loss)
     test_accuracy_aggregator.append(np.mean(sample_test_accuracy))
 
   test_loss = tf.reduce_mean(test_loss_aggregator)
