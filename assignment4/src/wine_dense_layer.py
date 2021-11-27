@@ -4,7 +4,7 @@
 
 import tensorflow as tf
 
-class WineDenseLayer(tf.keras.layers.Layer):
+class WineDenseLayer(tf.keras.layers.Dense):
     '''
         Custom Dense Layer subclassing from tf.keras.layers.Layer
 
