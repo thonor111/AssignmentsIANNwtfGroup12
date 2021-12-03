@@ -2,14 +2,15 @@ import tensorflow as tf
 import tensorflow_datasets as tfds
 import input_pipeline, training_loop
 from model import Model
+from resNetModel import ResNetModel
 import matplotlib.pyplot as plt
 import tensorflow.keras as K
 
 tf.keras.backend.clear_session()
 
 # load and split dataset into train, validation and test split
-train_data, valid_data, test_data = tfds.load('fashion_mnist', split = 
-                ['train[:83%]', 'train[83%:]', 'test'], as_supervised = True)
+train_data, valid_data, test_data = tfds.load('cifar10', split =
+                ['train', 'train', 'test'], as_supervised = True)
 
 # apply input pipeline to dataset splits
 train_data = train_data.apply(input_pipeline.prepare_data)
@@ -21,7 +22,7 @@ num_epochs = 10
 alpha = 0.1
 
 # Initialize Model
-model = Model()
+model = ResNetModel()
 
 # loss function
 loss_function = K.losses.CategoricalCrossentropy()
