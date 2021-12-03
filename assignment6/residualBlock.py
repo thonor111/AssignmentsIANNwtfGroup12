@@ -6,13 +6,13 @@ class ResidualBlock(K.layers.Layer):
     def __init__(self, input_channel_dimension):
         super(ResidualBlock, self).__init__()
         self.conv1 = K.layers.Conv2D(
-            filters = 8, kernel_size = 1,
+            filters = 64, kernel_size = 1,
             padding = "same", strides = 1,
             activation = K.activations.relu
             )
         self.batchnorm1 = K.layers.BatchNormalization()
         self.conv2 = K.layers.Conv2D(
-            filters=8, kernel_size=3,
+            filters=64, kernel_size=3,
             padding="same", strides=1,
             activation=K.activations.relu
         )

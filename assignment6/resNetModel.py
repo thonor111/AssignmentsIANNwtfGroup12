@@ -54,6 +54,12 @@ class ResNetModel(tf.keras.Model):
             activation=K.activations.relu
         )
         self.residualBlock2 = ResidualBlock(64)
+        self.conv2 = K.layers.Conv2D(
+            filters=128, kernel_size=1,
+            padding="same", strides=1,
+            activation=K.activations.relu
+        )
+        self.residualBlock2 = ResidualBlock(128)
 
         self.global_pool = K.layers.GlobalAveragePooling2D()
 
