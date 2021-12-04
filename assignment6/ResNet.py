@@ -38,14 +38,14 @@ class ResNet(tf.keras.Model):
 
 
     # initialize model with two hidden layers and one output layer
-    def __init__(self, numDenseBlocks):
+    def __init__(self):
         '''
             Initializes hidden and output layers of the model
         '''
 
         super(ResNet, self).__init__()
-        self.listresblock = [ResidualBlock(32) for _ in range(numDenseBlocks)]
-        #self.conv1= tf.keras.layers.Conv2D(filters=32, kernel_size=3, padding="same", activation="relu")
+        
+        self.conv1= tf.keras.layers.Conv2D(filters=32, kernel_size=3, padding="same", activation="relu")
         self.conv2_1 = ResidualBlock(32)
         self.conv2= tf.keras.layers.Conv2D(filters=64, kernel_size=3, padding="same", activation="relu")
         self.conv2_2 = ResidualBlock(64)
@@ -56,9 +56,6 @@ class ResNet(tf.keras.Model):
 
     def call(self, x):
         x = self.conv1(x)
-        for layer in self.listresblock:
-            x= layer(x)
-
         x = self.conv2_1(x)
         x = self.conv2(x)
         x = self.conv2_2(x)
