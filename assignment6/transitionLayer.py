@@ -12,9 +12,9 @@ class TransitionLayer(K.layers.Layer):
             )
         self.batchnorm = K.layers.BatchNormalization()
         self.activation = K.layers.Activation("relu")
-        self.average_pooling = K.layers.AveragePooling2D(
-            pool_size = 2,
-            strides = 2
+        self.average_pooling = K.layers.AvgPool2D(
+            pool_size = (2, 2),
+            strides = (2, 2)
             )
 
 
@@ -22,5 +22,6 @@ class TransitionLayer(K.layers.Layer):
         x = self.conv(inputs)
         x = self.batchnorm(x)
         x = self.activation(x)
-        x = self.average_pooling(x)
+        # crashing for unknown reason when including pooling here
+        #x = self.average_pooling(x)
         return x
