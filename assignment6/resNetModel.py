@@ -8,15 +8,14 @@ from residualBlock import ResidualBlock
 
 class ResNetModel(tf.keras.Model):
     '''
-    Custom Model subclassing from tf.keras.Model
+    Custom Model subclassing from tf.keras.Model implementing the ResNet structure
 
     Architecture:
             Feature Learning Layers:
                 Convolutional Layer 1:
+                Residual Block 1:
                 Convolutional Layer 2:
-                Convolutional Layer 3:
-                Max Pooling Layer 1:
-                Max Pooling Layer 2:
+                Residual Block 2:
             Classification Layers:
                 Global Pooling Layer 1:
                 Output Layer:
@@ -26,10 +25,9 @@ class ResNetModel(tf.keras.Model):
         Attributes
         ----------
         conv_1:
+        residualBlock1:
         conv_2:
-        conv_3:
-        max_pool_1:
-        max_pool_2:
+        residualBlock2:
         global_pool:
         output_layer :
     '''

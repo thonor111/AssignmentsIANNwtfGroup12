@@ -9,15 +9,18 @@ from transitionLayer import TransitionLayer
 
 class DenseNetModel(tf.keras.Model):
     '''
-    Custom Model subclassing from tf.keras.Model
+    Custom Model subclassing from tf.keras.Model implementing the DenseNet structure
 
     Architecture:
             Feature Learning Layers:
                 Convolutional Layer 1:
-                Convolutional Layer 2:
-                Convolutional Layer 3:
-                Max Pooling Layer 1:
-                Max Pooling Layer 2:
+                Dense Block 1:
+                Transition Layer 1:
+                Dense Block 2:
+                Transition Layer 2:
+                Dense Block 3:
+                Transition Layer 3:
+
             Classification Layers:
                 Global Pooling Layer 1:
                 Output Layer:
@@ -26,16 +29,17 @@ class DenseNetModel(tf.keras.Model):
 
         Attributes
         ----------
-        conv_1:
-        conv_2:
-        conv_3:
-        max_pool_1:
-        max_pool_2:
+        conv1:
+        denseBlock1:
+        transitionLayer1:
+        denseBlock2:
+        transitionLayer2:
+        denseBlock3:
+        transitionLayer3:
         global_pool:
         output_layer :
     '''
 
-    # initialize model with two hidden layers and one output layer
     def __init__(self):
         '''
             Initializes hidden and output layers of the model
@@ -43,12 +47,14 @@ class DenseNetModel(tf.keras.Model):
 
         super(DenseNetModel, self).__init__()
 
+        # one convolutional layer to get a greater number of feature maps
         self.conv1 = K.layers.Conv2D(
             filters = 8, kernel_size = 1,
             padding = "same", strides = 1,
             activation = K.activations.relu
             )
 
+        # alternating dense blocks and transition layers increasing and decreasing the number of inputs to the next layer
         self.denseBlock1 = DenseBlock()
         self.transitionLayer1 = TransitionLayer(number_feature_maps = 32)
         self.denseBlock2 = DenseBlock()
@@ -56,8 +62,9 @@ class DenseNetModel(tf.keras.Model):
         self.denseBlock3 = DenseBlock()
         self.transitionLayer3 = TransitionLayer(number_feature_maps=32)
 
+        # pooling for classification
         self.global_pool = K.layers.GlobalAveragePooling2D()
-
+        # applying softmax for classification
         self.output_layer = K.layers.Dense(10, activation=tf.nn.softmax)
 
     def call(self, inputs):
