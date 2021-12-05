@@ -7,15 +7,14 @@ class TransitionLayer(K.layers.Layer):
         super(TransitionLayer, self).__init__()
         self.conv = K.layers.Conv2D(
             filters = number_feature_maps, kernel_size = 1,
-            padding = "none", strides = 2,
+            strides = 2,
             activation = K.activations.relu
             )
         self.batchnorm = K.layers.BatchNormalization()
         self.activation = K.layers.Activation("relu")
         self.average_pooling = K.layers.AveragePooling2D(
             pool_size = 2,
-            strides = 2,
-            padding = "none"
+            strides = 2
             )
 
 

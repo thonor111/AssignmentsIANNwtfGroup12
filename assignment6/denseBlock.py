@@ -16,11 +16,7 @@ class DenseBlock(K.layers.Layer):
             padding="same", strides=1
         )
         self.batchnorm2 = K.layers.BatchNormalization()
-        self.conv3 = K.layers.Conv2D(
-            filters=32, kernel_size=1,
-            padding="same", strides=1
-        )
-        self.batchnorm3 = K.layers.BatchNormalization()
+
 
 
     def call(self, inputs):

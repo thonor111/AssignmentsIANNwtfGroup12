@@ -1,8 +1,8 @@
 import tensorflow as tf
 import tensorflow_datasets as tfds
 import input_pipeline, training_loop
-from model import Model
 from resNetModel import ResNetModel
+from denseNetModel import DenseNetModel
 import matplotlib.pyplot as plt
 import tensorflow.keras as K
 
@@ -21,8 +21,9 @@ test_data = test_data.apply(input_pipeline.prepare_data)
 num_epochs = 10
 alpha = 0.1
 
-# Initialize Model
-model = ResNetModel()
+# Initialize Models
+#resNetModel = ResNetModel()
+resNetModel = DenseNetModel()
 
 # loss function
 loss_function = K.losses.CategoricalCrossentropy()
@@ -31,46 +32,46 @@ loss_function = K.losses.CategoricalCrossentropy()
 optimizer = K.optimizers.SGD(alpha)
 
 # initialize lists for later visualization.
-train_losses = []
-valid_losses = []
-valid_accuracies = []
+train_losses_res = []
+valid_losses_res = []
+valid_accuracies_res = []
 
 # testing once before we begin
-valid_loss, valid_accuracy = training_loop.test(model, test_data, loss_function)
-valid_losses.append(valid_loss)
-valid_accuracies.append(valid_accuracy)
+valid_loss_res, valid_accuracy_res = training_loop.test(resNetModel, test_data, loss_function)
+valid_losses_res.append(valid_loss_res)
+valid_accuracies_res.append(valid_accuracy_res)
 
 # check how model performs on train data once before we begin
-train_loss, _ = training_loop.test(model, train_data, loss_function)
-train_losses.append(train_loss)
+train_loss_res, _ = training_loop.test(resNetModel, train_data, loss_function)
+train_losses_res.append(train_loss_res)
 
 # We train for num_epochs epochs.
 for epoch in range(num_epochs):
 
     # print out starting accuracy
-    print(f'Epoch: {str(epoch)} starting with accuracy {valid_accuracies[-1]}')
+    print(f'Epoch: {str(epoch)} starting with accuracy {valid_accuracies_res[-1]}')
 
     # training (and checking in with training)
-    epoch_losses = []
+    epoch_losses_res = []
     for input, target in train_data:
-        train_loss = training_loop.train_step(model, input, target, 
+        train_loss_res = training_loop.train_step(resNetModel, input, target,
                                         loss_function, optimizer)
-        epoch_losses.append(train_loss)
+        epoch_losses_res.append(train_loss_res)
 
     # track training loss
-    train_losses.append(tf.reduce_mean(epoch_losses))
+    train_losses_res.append(tf.reduce_mean(epoch_losses_res))
 
     # testing, so we can track accuracy and test loss
-    valid_loss, valid_accuracy = training_loop.test(model, valid_data, 
+    valid_loss_res, valid_accuracy_res = training_loop.test(resNetModel, valid_data,
                                                 loss_function)
-    valid_losses.append(valid_loss)
-    valid_accuracies.append(valid_accuracy)
+    valid_losses_res.append(valid_loss_res)
+    valid_accuracies_res.append(valid_accuracy_res)
 
 # Visualize accuracy and loss for training and test data.
 plt.figure()
-line1, = plt.plot(train_losses)
-line2, = plt.plot(valid_losses)
-line3, = plt.plot(valid_accuracies)
+line1, = plt.plot(train_losses_res)
+line2, = plt.plot(valid_losses_res)
+line3, = plt.plot(valid_accuracies_res)
 plt.xlabel("Epoch")
 plt.ylabel("Loss/Accuracy")
 plt.ylim(top = 1)
