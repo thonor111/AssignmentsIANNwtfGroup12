@@ -107,6 +107,19 @@ def visualize(train_losses, valid_losses, valid_accuracies):
     plt.xlabel("Training epoch")
     plt.show()
 
+def visualize_2(train_losses, valid_losses, valid_accuracies):
+    fig, axs = plt.subplots(2,1)
+
+    axs[0].plot(train_losses)
+    axs[0].plot(valid_losses)
+    axs[1].plot(valid_accuracies)
+
+    fig.legend([" Train_ds loss", " Valid_ds loss", " Valid_ds accuracy"])
+    plt.xlabel("Training epoch")
+    fig.tight_layout()
+    plt.show()
+ 
+
 
 def classify(model, optimizer, num_epochs, train_ds, valid_ds):
     """
