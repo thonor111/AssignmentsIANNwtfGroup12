@@ -12,9 +12,6 @@ tf.keras.backend.clear_session()
 train_data, valid_data, test_data = tfds.load('cifar10', split =
                 ['train', 'train', 'test'], as_supervised = True)
 
-train_data = train_data.take(1000)
-valid_data = valid_data.take(1000)
-test_data = test_data.take(100)
 
 # apply input pipeline to dataset splits
 train_data = train_data.apply(input_pipeline.prepare_data)
@@ -99,7 +96,7 @@ line5, = plt.plot(valid_losses_dense)
 line6, = plt.plot(valid_accuracies_dense)
 plt.xlabel("Epoch")
 plt.ylabel("Loss/Accuracy")
-plt.ylim(top = 1)
+#plt.ylim(top = 1)
 plt.ylim(bottom = 0)
 plt.legend((line1,line2,line3,line4,line5,line6),("ResNet training","ResNet test", "ResNet test accuracy", "DenseNet training","DenseNet test", "DenseNet test accuracy"))
 plt.show()
