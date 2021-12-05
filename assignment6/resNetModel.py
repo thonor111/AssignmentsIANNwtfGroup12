@@ -74,12 +74,15 @@ class ResNetModel(tf.keras.Model):
             Returns:
                 y: the prediction of the model
         '''
-
+        # using convolutional layers to change the channel dimensions
         x = self.conv1(inputs)
+        # passing through residual blocks keeping these dimensions
         x = self.residualBlock1(x)
         x = self.conv2(x)
         x = self.residualBlock2(x)
+        # pooling for the classification
         x = self.global_pool(x)
+        # applying softmax for classification
         y = self.output_layer(x)
 
         return y
