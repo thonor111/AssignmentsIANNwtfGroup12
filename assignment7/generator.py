@@ -1,3 +1,7 @@
+'''
+authors: tnortmann, hsanna, lmcdonald
+'''
+
 import numpy as np
 
 def integration_task(seq_len, num_samples):
