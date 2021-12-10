@@ -7,10 +7,10 @@ import input_pipeline, training_loop
 
 
 dataset = tf.data.Dataset.from_generator(my_integration_task, output_signature= (
-                                                                                tf.TensorSpec(shape = (10), dtype = tf.float32),
+                                                                                tf.TensorSpec(shape = (10,1), dtype = tf.float32),
                                                                                 tf.TensorSpec(shape= (), dtype = tf.int32)))
 
-number_data_points = 1000
+number_data_points = 32000
 
 train_data = dataset.take(int(0.9 * number_data_points))
 valid_data = dataset.take(int(0.9 * number_data_points))
