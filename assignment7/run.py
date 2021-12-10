@@ -10,7 +10,7 @@ dataset = tf.data.Dataset.from_generator(my_integration_task, output_signature= 
                                                                                 tf.TensorSpec(shape = (10,1), dtype = tf.float32),
                                                                                 tf.TensorSpec(shape= (), dtype = tf.int32)))
 
-number_data_points = 32000
+number_data_points = 64000
 
 train_data = dataset.take(int(0.9 * number_data_points))
 valid_data = dataset.take(int(0.9 * number_data_points))
@@ -73,11 +73,13 @@ for epoch in range(num_epochs):
 
 # Visualize accuracy and loss for training and test data.
 plt.figure()
-line1, = plt.plot(train_losses)
-line2, = plt.plot(valid_losses)
+#line1, = plt.plot(train_losses)
+#line2, = plt.plot(valid_losses)
 line3, = plt.plot(valid_accuracies)
 plt.xlabel("Epoch")
 plt.ylabel("Loss/Accuracy")
+plt.ylim(top = 1)
 plt.ylim(bottom = 0)
-plt.legend((line1,line2, line3),("training","test", "test accuracy"))
+#plt.legend((line1,line2, line3),("training","test", "test accuracy"))
+plt.legend([line3],["test accuracy"])
 plt.show()
