@@ -19,15 +19,22 @@ class LSTM_Cell(K.layers.Layer):
         self.tanh = K.layers.Activation("tanh")
 
     def call(self, x, states):
-        # "forgetting" some of the old states
+        '''
+
+        :param x:
+        :param states: tupel (hidden state, cell state)
+        :return:
+        '''
         # where to forget
-        forgetting = self.forget_gate(x)
-        states = tf.math.multiply(forgetting, states)
-        # calculating the new candidates ofr the states
-        candidates = self.cell_state_candidates(x)
+        forgetting = self.forget_gate(tf.concat([states[0], x], axis = 1))
+        # "forgetting" some of the old states
+        states[1] = tf.math.multiply(forgetting, states[1])
+        # calculating the new candidates of the states
+        candidates = self.cell_state_candidates(tf.concat([states[0], x], axis = 1))
         # only using some of the candidates
-        candidates = tf.math.multiply(candidates, self.input_gate(x))
-        states = tf.math.add(states, candidates)
-        out = self.output_gate(x)
-        out = tf.math.multiply(self.tanh(states), out)
+        candidates = tf.math.multiply(candidates, self.input_gate(tf.concat([states[0], x], axis = 1)))
+        states[1] = tf.math.add(states[1], candidates)
+        out = self.output_gate(tf.concat([states[0], x], axis = 1))
+        out = tf.math.multiply(self.tanh(states[1]), out)
+        states[0] = out
         return out, states

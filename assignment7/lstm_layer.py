@@ -10,7 +10,8 @@ class LSTM_Layer(K.layers.Layer):
 
     def __init__(self):
         super(LSTM_Layer, self).__init__()
-        self.cell = LSTM_Cell(1)
+        self.cell_depth = 8
+        self.cell = LSTM_Cell(self.cell_depth)
 
     def call(self, x, states):
         outputs = tf.TensorArray(tf.float32, size=0, dynamic_size=True)
@@ -26,6 +27,6 @@ class LSTM_Layer(K.layers.Layer):
         return outputs.stack()
 
     def zero_states(self, batch_size):
-        states =  tf.zeros(batch_size)
-        states = tf.reshape(states, (64,1))
-        return states
+        cell_states =  tf.zeros((batch_size, self.cell_depth))
+        hidden_states = tf.zeros((batch_size, self.cell_depth))
+        return [hidden_states, cell_states]
