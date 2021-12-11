@@ -11,9 +11,7 @@ class LSTM_Model(K.Model):
         self.output_layer = K.layers.Dense(1, activation = "sigmoid")
 
     def call(self, x):
-        #x = self.read_in(x)
+        x = self.read_in(x)
         x = self.lstm(x, self.lstm.zero_states(64))
-        # transpose to apply the output layer to every time stamp individually
-        #x = tf.transpose(x)
         x = self.output_layer(x)
         return x

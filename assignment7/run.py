@@ -73,13 +73,10 @@ for epoch in range(num_epochs):
 
 # Visualize accuracy and loss for training and test data.
 plt.figure()
-line1, = plt.plot(train_losses)
-line2, = plt.plot(valid_losses)
-line3, = plt.plot(valid_accuracies)
+line1, = plt.plot(valid_accuracies)
 plt.xlabel("Epoch")
 plt.ylabel("Loss/Accuracy")
 plt.ylim(top = 1)
 plt.ylim(bottom = 0)
-plt.legend((line1,line2, line3),("training","test", "test accuracy"))
-#plt.legend([line3],["test accuracy"])
+plt.legend([line1],["test accuracy"])
 plt.show()

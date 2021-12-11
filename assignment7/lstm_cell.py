@@ -12,15 +12,14 @@ class LSTM_Cell(K.layers.Layer):
         # using an initial bias in the forget gate of 1 as recommended in the paper by Jozezefowicz et al
         # this helps with keeping a lot of information in th beginning -> being able to remember and not forget important information
         self.forget_gate = K.layers.Dense(units = units, activation = "sigmoid", bias_initializer=K.initializers.Ones())
-        #self.forget_gate = K.layers.Dense(units=units, activation="sigmoid")
         self.input_gate = K.layers.Dense(units = units, activation = "sigmoid")
         self.cell_state_candidates = K.layers.Dense(units = units, activation = "tanh")
         self.output_gate = K.layers.Dense(units = units, activation = "sigmoid")
         self.tanh = K.layers.Activation("tanh")
 
+    @tf.function
     def call(self, x, states):
         '''
-
         :param x:
         :param states: tupel (hidden state, cell state)
         :return:

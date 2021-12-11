@@ -13,6 +13,6 @@ def integration_task(seq_len, num_samples):
 
 def my_integration_task():
     seq_len = 25
-    num_samples = 64000
+    num_samples = 32000
     for elem in integration_task(seq_len, num_samples):
         yield elem

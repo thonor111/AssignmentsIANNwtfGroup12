@@ -20,10 +20,6 @@ class LSTM_Layer(K.layers.Layer):
             elem = x_unstacked[index]
             out, states = self.cell(elem, states)
             outputs = outputs.write(index, out)
-        # transposing to divide by entries and not by batch-elements
-        # for i, elem in enumerate(tf.transpose(x)):
-        #     out, states = self.cell(elem, states)
-        #     outputs = outputs.write(i, out)
         return outputs.stack()
 
     def zero_states(self, batch_size):
