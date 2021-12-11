@@ -12,7 +12,7 @@ def integration_task(seq_len, num_samples):
         yield data_points, int(target)
 
 def my_integration_task():
-    seq_len = 10
+    seq_len = 25
     num_samples = 64000
     for elem in integration_task(seq_len, num_samples):
         yield elem
