@@ -27,13 +27,12 @@ class LSTM_Cell(K.layers.Layer):
         # where to forget
         forgetting = self.forget_gate(tf.concat([states[0], x], axis = 1))
         # "forgetting" some of the old states
-        states[1] = tf.math.multiply(forgetting, states[1])
+        new_cell_state = tf.math.multiply(forgetting, states[1])
         # calculating the new candidates of the states
         candidates = self.cell_state_candidates(tf.concat([states[0], x], axis = 1))
         # only using some of the candidates
         candidates = tf.math.multiply(candidates, self.input_gate(tf.concat([states[0], x], axis = 1)))
-        states[1] = tf.math.add(states[1], candidates)
+        new_cell_state = tf.math.add(new_cell_state, candidates)
         out = self.output_gate(tf.concat([states[0], x], axis = 1))
-        out = tf.math.multiply(self.tanh(states[1]), out)
-        states[0] = out
-        return out, states
+        out = tf.math.multiply(self.tanh(new_cell_state), out)
+        return out, [out, new_cell_state]
