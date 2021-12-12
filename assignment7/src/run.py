@@ -1,27 +1,40 @@
+'''
+authors: tnortmann, hsanna, lmcdonald
+'''
+
 from generator import my_integration_task
 import tensorflow as tf
 import tensorflow.keras as K
 from lstm_model import LSTM_Model
 import matplotlib.pyplot as plt
-import input_pipeline, training_loop
+import input_pipeline
+import training_loop
 
+# generate dataset
+dataset = tf.data.Dataset.from_generator(
+    my_integration_task, 
+    output_signature=(
+        tf.TensorSpec(shape=(25, 1), dtype=tf.float32), 
+        tf.TensorSpec(shape=(), dtype=tf.int32)
+        )
+    )
 
-dataset = tf.data.Dataset.from_generator(my_integration_task, output_signature= (
-                                                                                tf.TensorSpec(shape = (25,1), dtype = tf.float32),
-                                                                                tf.TensorSpec(shape= (), dtype = tf.int32)))
+num_samples = 32000
 
-number_data_points = 32000
+num_train_samples = int(0.8 * num_samples)
+num_valid_samples = int(0.1 * num_samples)
+num_test_samples = int(0.1 * num_samples)
 
-train_data = dataset.take(int(0.8 * number_data_points))
-dataset.skip(int(0.8 * number_data_points))
-valid_data = dataset.take(int(0.1 * number_data_points))
-dataset.skip(int(0.1 * number_data_points))
-test_data = dataset.take(int(0.1 * number_data_points))
+# split into train, valid and test
+train_data = dataset.take(num_train_samples)
+valid_data = dataset.skip(num_train_samples).take(num_valid_samples)
+test_data = dataset.skip(num_train_samples).skip(
+    num_valid_samples).take(num_test_samples)
 
+# prepare data
 train_data = train_data.apply(input_pipeline.prepare_data)
 valid_data = valid_data.apply(input_pipeline.prepare_data)
 test_data = test_data.apply(input_pipeline.prepare_data)
-
 
 # Hyperparameters
 num_epochs = 10
@@ -42,7 +55,8 @@ valid_losses = []
 valid_accuracies = []
 
 # testing once before we begin
-valid_loss, valid_accuracy = training_loop.test(model, valid_data, loss_function)
+valid_loss, valid_accuracy = training_loop.test(
+    model, valid_data, loss_function)
 valid_losses.append(valid_loss)
 valid_accuracies.append(valid_accuracy)
 
@@ -60,7 +74,7 @@ for epoch in range(num_epochs):
     epoch_losses = []
     for input, target in train_data:
         train_loss = training_loop.train_step(model, input, target,
-                                        loss_function, optimizer)
+                                              loss_function, optimizer)
         epoch_losses.append(train_loss)
 
     # track training loss
@@ -68,7 +82,7 @@ for epoch in range(num_epochs):
 
     # testing, so we can track accuracy and test loss
     valid_loss, valid_accuracy = training_loop.test(model, valid_data,
-                                                loss_function)
+                                                    loss_function)
     valid_losses.append(valid_loss)
     valid_accuracies.append(valid_accuracy)
 
@@ -77,7 +91,7 @@ plt.figure()
 line1 = plt.plot(valid_accuracies)
 plt.xlabel("Epoch")
 plt.ylabel("Accuracy")
-plt.ylim(top = 1)
-plt.ylim(bottom = 0)
-plt.legend([line1],["Validation accuracy"])
+plt.ylim(top=1)
+plt.ylim(bottom=0)
+plt.legend([line1], ["Validation accuracy"])
 plt.show()
