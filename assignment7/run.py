@@ -12,9 +12,10 @@ dataset = tf.data.Dataset.from_generator(my_integration_task, output_signature= 
 
 number_data_points = 32000
 
-train_data = dataset.take(int(0.9 * number_data_points))
-valid_data = dataset.take(int(0.9 * number_data_points))
-dataset.skip(int(0.9 * number_data_points))
+train_data = dataset.take(int(0.8 * number_data_points))
+dataset.skip(int(0.8 * number_data_points))
+valid_data = dataset.take(int(0.1 * number_data_points))
+dataset.skip(int(0.1 * number_data_points))
 test_data = dataset.take(int(0.1 * number_data_points))
 
 train_data = train_data.apply(input_pipeline.prepare_data)
@@ -30,7 +31,7 @@ alpha = 0.1
 model = LSTM_Model()
 
 # loss function
-loss_function = K.losses.CategoricalCrossentropy()
+loss_function = K.losses.MeanSquaredError()
 
 # optimizer
 optimizer = K.optimizers.SGD(alpha)
@@ -41,7 +42,7 @@ valid_losses = []
 valid_accuracies = []
 
 # testing once before we begin
-valid_loss, valid_accuracy = training_loop.test(model, test_data, loss_function)
+valid_loss, valid_accuracy = training_loop.test(model, valid_data, loss_function)
 valid_losses.append(valid_loss)
 valid_accuracies.append(valid_accuracy)
 
@@ -73,10 +74,10 @@ for epoch in range(num_epochs):
 
 # Visualize accuracy and loss for training and test data.
 plt.figure()
-line1, = plt.plot(valid_accuracies)
+line1 = plt.plot(valid_accuracies)
 plt.xlabel("Epoch")
-plt.ylabel("Loss/Accuracy")
+plt.ylabel("Accuracy")
 plt.ylim(top = 1)
 plt.ylim(bottom = 0)
-plt.legend([line1],["test accuracy"])
+plt.legend([line1],["Validation accuracy"])
 plt.show()
