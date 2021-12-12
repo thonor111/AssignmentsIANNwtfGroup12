@@ -1,0 +1,18 @@
+Should we rather take this as a regression, or a classification problem?
+
+We should see this as a classification task as we do not have to learn (and continue) a structure in the given inputs that is dependent to time/ the number of the input.
+In contrast, we do not even have to learn the integral at the final point (which would already be mostly seperated of the structures within earlier points of the inputs)
+but only have to predict whether its greater or smaller than 1,in other words classifying it as a integral greater or smaller than 1.
+
+
+Can/ should we use truncated BPTT here?
+
+The idea behind truncated BPTT is to unfold the RNN to apply Backpropagation to every timestep individually up to a certain level
+(where we truncate/ stopp unfolding to avoid vanishing/ exploding gradients). This can be sensible as we can backpropagate the error through time and change the weights at the timesteps where our regression went wrong the strongest.
+Truncation is also sensible as we apply the canges in all different timesteps to the same weights and therefore might add up to very big changes resulting in very big or very small weights.
+The problem in this case is that we don't have seperate targets for the seperate timesteps and would therefore have to use the same targes or errors everywere. Since the datapoints of our input do not correlate with each other in any way this is not sensible.
+In other words: If our overall integral is above 1, looking at a timestep which has an input above 0 and at a timestep with an input below 0 seperately and changing them individually but with the same error regarding the 1 as output is not a good idea.
+For this to work really well we would have to have the integrals at the different timesteps as targets, changing the weights at the positive input with the regard to a positive change
+of the integral and the weights at the negative input with regard to the negative change in the integral.
+
+So no, we shouldn't use BPTT here. But since we would have to use the same error at all timesteps we could do this, it would basically be the same as standart gradient descent, hust applied 25 times. For this to work we would have to lower our learning rate (as we have every change 25 times) but we could do it, it's just not sensible.
