@@ -4,6 +4,8 @@ authors: tnortmann, hsanna, lmcdonald
 
 import tensorflow as tf
 
+noise_strength = 0.2
+
 def prepare_data(data):
     '''
         Prepares a tf dataset by converting categorical features into one-hot features
@@ -19,11 +21,14 @@ def prepare_data(data):
     # convert data from uint8 to float32
     data = data.map(lambda img, target: (tf.cast(img, tf.float32), target))
 
-    # input normalization [-1,1]
-    data = data.map(lambda img, target: ((img/127.) - 1, target))
+    # take the images also as targets
+    data = data.map(lambda img, target: (img, img))
 
-    # create one-hot targets
-    data = data.map(lambda img, target: (img, tf.one_hot(target, depth=10)))
+    # image normalization [-1,1]
+    data = data.map(lambda img, target: (((img / 127.) - 1) * (1 - noise_strength), (target / 127.) - 1))
+
+    # adding noise to the image
+    data = data.map(lambda img, target: (tf.math.add(img, tf.math.multiply(tf.random.uniform([28,28]), noise_strength)), target))
 
     # cache
     data = data.cache()

@@ -5,6 +5,7 @@ authors: tnortmann, hsanna, lmcdonald
 import tensorflow as tf
 import tensorflow.keras as K
 import matplotlib.pyplot as plt
+import tensorflow_datasets as tfds
 import input_pipeline
 import training_loop
 
@@ -16,22 +17,11 @@ import training_loop
 #         tf.TensorSpec(shape=(), dtype=tf.int32)
 #         )
 #     )
+train_data, test_data = tfds.load('mnist', split=['train', 'test'], as_supervised=True)
 
-num_samples = 32000
-
-num_train_samples = int(0.8 * num_samples)
-num_valid_samples = int(0.1 * num_samples)
-num_test_samples = int(0.1 * num_samples)
-
-# split into train, valid and test
-train_data = dataset.take(num_train_samples)
-valid_data = dataset.skip(num_train_samples).take(num_valid_samples)
-test_data = dataset.skip(num_train_samples).skip(
-    num_valid_samples).take(num_test_samples)
 
 # prepare data
 train_data = train_data.apply(input_pipeline.prepare_data)
-valid_data = valid_data.apply(input_pipeline.prepare_data)
 test_data = test_data.apply(input_pipeline.prepare_data)
 
 # Hyperparameters
@@ -54,7 +44,7 @@ valid_accuracies = []
 
 # testing once before we begin
 valid_loss, valid_accuracy = training_loop.test(
-    model, valid_data, loss_function)
+    model, test_data, loss_function)
 valid_losses.append(valid_loss)
 valid_accuracies.append(valid_accuracy)
 
@@ -79,7 +69,7 @@ for epoch in range(num_epochs):
     train_losses.append(tf.reduce_mean(epoch_losses))
 
     # testing, so we can track accuracy and test loss
-    valid_loss, valid_accuracy = training_loop.test(model, valid_data,
+    valid_loss, valid_accuracy = training_loop.test(model, test_data,
                                                     loss_function)
     valid_losses.append(valid_loss)
     valid_accuracies.append(valid_accuracy)
