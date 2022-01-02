@@ -23,8 +23,6 @@ def train_step(model, input, target, loss_function, optimizer):
   # loss_object and optimizer_object are instances of respective tensorflow classes
   with tf.GradientTape() as tape:
     prediction = model(input)
-    # only using the prediction of the last timestamp
-    prediction = prediction[-1,:,0]
     loss = loss_function(target, prediction)
   gradients = tape.gradient(loss, model.trainable_variables)
 
@@ -51,11 +49,9 @@ def test(model, test_data, loss_function):
 
   for (input, target) in test_data:
     prediction = model(input)
-    # only using the prediction of the last timestamp
-    prediction = prediction[-1,:,0]
     sample_test_loss = loss_function(target, prediction)
-    sample_test_accuracy =  target == tf.cast(tf.round(prediction), tf.int32)
-    sample_test_accuracy = np.mean(sample_test_accuracy)
+    sample_test_accuracy =  tf.math.abs(tf.math.subtract(target, tf.math.round(prediction)))
+    sample_test_accuracy = 1 - tf.reduce_mean(sample_test_accuracy)
     test_loss_aggregator.append(sample_test_loss.numpy())
     test_accuracy_aggregator.append(np.mean(sample_test_accuracy))
 

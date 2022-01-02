@@ -24,8 +24,8 @@ def prepare_data(data):
     # take the images also as targets
     data = data.map(lambda img, target: (img, img))
 
-    # image normalization [-1,1]
-    data = data.map(lambda img, target: (((img / 127.) - 1) * (1 - noise_strength), (target / 127.) - 1))
+    # image normalization [0,1]
+    data = data.map(lambda img, target: ((img / 255.) * (1 - noise_strength), target / 255.))
 
     # adding noise to the image
     data = data.map(lambda img, target: (tf.math.add(img, tf.math.multiply(tf.random.uniform([28,28]), noise_strength)), target))

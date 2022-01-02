@@ -8,15 +8,8 @@ import matplotlib.pyplot as plt
 import tensorflow_datasets as tfds
 import input_pipeline
 import training_loop
+from autoencoder import Autoencoder
 
-# # generate dataset
-# dataset = tf.data.Dataset.from_generator(
-#     my_integration_task,
-#     output_signature=(
-#         tf.TensorSpec(shape=(25, 1), dtype=tf.float32),
-#         tf.TensorSpec(shape=(), dtype=tf.int32)
-#         )
-#     )
 train_data, test_data = tfds.load('mnist', split=['train', 'test'], as_supervised=True)
 
 
@@ -29,7 +22,7 @@ num_epochs = 10
 alpha = 0.1
 
 # Initialize Model
-# model = LSTM_Model()
+model = Autoencoder()
 
 # loss function
 loss_function = K.losses.MeanSquaredError()
