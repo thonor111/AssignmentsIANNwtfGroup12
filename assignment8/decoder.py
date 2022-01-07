@@ -15,8 +15,12 @@ class Decoder(K.Model):
         super(Decoder, self).__init__()
         self.dense = K.layers.Dense(49, activation = "sigmoid")
         self.reshape = K.layers.Reshape((7,7,1))
-        self.trans_conv_1 = K.layers.Conv2DTranspose(filters = 16, kernel_size = 3, strides = 2, padding = "same", activation = "relu")
-        self.trans_conv_2 = K.layers.Conv2DTranspose(filters = 16, kernel_size = 3, strides = 2, padding = "same", activation = "relu")
+        self.trans_conv_1 = K.layers.Conv2DTranspose(filters = 8, kernel_size = 3, strides = 1, padding = "same", activation = "relu")
+        self.trans_conv_2 = K.layers.Conv2DTranspose(filters = 8, kernel_size = 3, strides = 2, padding = "same", activation = "relu")
+        self.trans_conv_3 = K.layers.Conv2DTranspose(filters=16, kernel_size=3, strides=1, padding="same",activation="relu")
+        self.trans_conv_4 = K.layers.Conv2DTranspose(filters=16, kernel_size=3, strides=1, padding="same",activation="relu")
+        self.trans_conv_5 = K.layers.Conv2DTranspose(filters=32, kernel_size=3, strides=2, padding="same",activation="relu")
+        self.trans_conv_6 = K.layers.Conv2DTranspose(filters=32, kernel_size=3, strides=1, padding="same",activation="relu")
         self.out = K.layers.Conv2D(filters = 1, kernel_size = 3, strides = 1, padding = "same", activation = "sigmoid")
 
     @tf.function
@@ -25,5 +29,9 @@ class Decoder(K.Model):
         x = self.reshape(x)
         x = self.trans_conv_1(x)
         x = self.trans_conv_2(x)
+        x = self.trans_conv_3(x)
+        x = self.trans_conv_4(x)
+        x = self.trans_conv_5(x)
+        x = self.trans_conv_6(x)
         x = self.out(x)
         return x

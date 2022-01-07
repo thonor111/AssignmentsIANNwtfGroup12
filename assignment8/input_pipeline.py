@@ -22,13 +22,13 @@ def prepare_data(data):
     data = data.map(lambda img, target: (tf.cast(img, tf.float32), target))
 
     # take the images also as targets
-    data = data.map(lambda img, target: (img, img))
+    data = data.map(lambda img, target: (img, img, target))
 
     # image normalization [0,1]
-    data = data.map(lambda img, target: ((img / 255.) * (1 - noise_strength), target / 255.))
+    data = data.map(lambda img, target, char_class: ((img / 255.) * (1 - noise_strength), target / 255., char_class))
 
     # adding noise to the image
-    data = data.map(lambda img, target: (tf.math.add(img, tf.math.multiply(tf.random.uniform([28,28]), noise_strength)), target))
+    data = data.map(lambda img, target, char_class: (tf.math.add(img, tf.math.multiply(tf.random.uniform(img.shape), noise_strength)), target, char_class))
 
     # cache
     data = data.cache()

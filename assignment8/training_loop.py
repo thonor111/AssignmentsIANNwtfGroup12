@@ -47,7 +47,7 @@ def test(model, test_data, loss_function):
   test_accuracy_aggregator = []
   test_loss_aggregator = []
 
-  for (input, target) in test_data:
+  for (input, target, char_class) in test_data:
     prediction = model(input)
     sample_test_loss = loss_function(target, prediction)
     sample_test_accuracy =  tf.math.abs(tf.math.subtract(target, tf.math.round(prediction)))
