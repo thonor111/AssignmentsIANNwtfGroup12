@@ -21,7 +21,7 @@ test_data = test_data.apply(input_pipeline.prepare_data)
 
 # Hyperparameters
 num_epochs = 10
-alpha = 0.1
+alpha = 0.001
 embedding_dimensions = 10
 
 # Initialize Model
@@ -31,7 +31,7 @@ model = Autoencoder(embedding_dimensions)
 loss_function = K.losses.MeanSquaredError()
 
 # optimizer
-optimizer = K.optimizers.SGD(alpha)
+optimizer = K.optimizers.Adam(alpha)
 
 # initialize lists for later visualization.
 train_losses = []
@@ -58,13 +58,13 @@ for epoch in range(num_epochs):
     plotting_examples = test_data.take(3)
     for input, target, char_class in plotting_examples:
         plt.gray()
-        plt.axis("off")
         plt.subplot(1, 2, 1);
         plt.imshow(input.numpy()[0].reshape((28,28)))
         plt.title("Input")
         plt.subplot(1, 2, 2);
         plt.imshow(model(input).numpy()[0].reshape((28,28)))
         plt.title("Reconstruction")
+        plt.axis("off")
         plt.show()
 
     # training (and checking in with training)
