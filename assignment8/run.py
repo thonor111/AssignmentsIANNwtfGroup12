@@ -61,6 +61,7 @@ for epoch in range(num_epochs):
         plt.subplot(1, 2, 1);
         plt.imshow(input.numpy()[0].reshape((28,28)))
         plt.title("Input")
+        plt.axis("off")
         plt.subplot(1, 2, 2);
         plt.imshow(model(input).numpy()[0].reshape((28,28)))
         plt.title("Reconstruction")
@@ -97,7 +98,7 @@ for epoch in range(num_epochs):
 images_to_embed = test_data.take(1000)
 first_embedding = True
 for input, target, char_class in images_to_embed:
-    embedding = model.encode(input)
+    embedding = model.encode(input, training = False)
     embedding = embedding.numpy()
     embedding = TSNE(n_components=2, learning_rate='auto', init='random').fit_transform(embedding)
     if first_embedding:
@@ -106,7 +107,6 @@ for input, target, char_class in images_to_embed:
         first_embedding = False
     else:
         embeddings = np.concatenate((embeddings, embedding), axis = 0)
-        #print(embeddings.shape)
         classes = np.concatenate((classes, char_class.numpy()), axis = 0)
 embeddings = np.array(embeddings)
 plt.figure()
