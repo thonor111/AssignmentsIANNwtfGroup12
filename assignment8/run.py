@@ -100,7 +100,6 @@ first_embedding = True
 for input, target, char_class in images_to_embed:
     embedding = model.encode(input, training = False)
     embedding = embedding.numpy()
-    embedding = TSNE(n_components=2, learning_rate='auto', init='random').fit_transform(embedding)
     if first_embedding:
         embeddings = embedding.copy()
         classes = char_class.numpy().copy()
@@ -109,6 +108,7 @@ for input, target, char_class in images_to_embed:
         embeddings = np.concatenate((embeddings, embedding), axis = 0)
         classes = np.concatenate((classes, char_class.numpy()), axis = 0)
 embeddings = np.array(embeddings)
+embeddings = TSNE(n_components=2, learning_rate='auto', init='random').fit_transform(embeddings)
 plt.figure()
 plt.scatter(embeddings[:,0], embeddings[:,1], c = classes, cmap = 'viridis')
 plt.colorbar()
