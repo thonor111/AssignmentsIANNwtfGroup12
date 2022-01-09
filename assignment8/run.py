@@ -51,22 +51,23 @@ train_losses.append(train_loss)
 # We train for num_epochs epochs.
 for epoch in range(num_epochs):
 
-    # print out starting accuracy
-    print(f'Epoch: {str(epoch)} starting with accuracy {valid_accuracies[-1]}')
-
-    # plotting some testing examples
-    plotting_examples = test_data.take(3)
+    # plotting some testing examples to visualize the learning
+    plotting_examples = test_data.take(5)
+    plot_number = 1
+    plt.figure(figsize=(20,5))
+    plt.suptitle(f"Epoch {epoch} with starting-accuracy {valid_accuracies[-1]}")
     for input, target, char_class in plotting_examples:
         plt.gray()
-        plt.subplot(1, 2, 1);
+        plt.subplot(2, 5, plot_number);
         plt.imshow(input.numpy()[0].reshape((28,28)))
         plt.title("Input")
         plt.axis("off")
-        plt.subplot(1, 2, 2);
+        plt.subplot(2, 5, plot_number + 5);
         plt.imshow(model(input).numpy()[0].reshape((28,28)))
         plt.title("Reconstruction")
         plt.axis("off")
-        plt.show()
+        plot_number += 1
+    plt.show()
 
     # training (and checking in with training)
     epoch_losses = []
@@ -84,19 +85,11 @@ for epoch in range(num_epochs):
     valid_losses.append(valid_loss)
     valid_accuracies.append(valid_accuracy)
 
-# Visualize accuracy and loss for training and test data.
-# plt.figure()
-# line1 = plt.plot(valid_accuracies)
-# plt.xlabel("Epoch")
-# plt.ylabel("Accuracy")
-# plt.ylim(top=1)
-# plt.ylim(bottom=0)
-# plt.legend([line1], ["Validation accuracy"])
-# plt.show()
 
-
+# embedding 1000 testing examples and plotting the latent space
 images_to_embed = test_data.take(1000)
 first_embedding = True
+searching_second_embedding = True
 for input, target, char_class in images_to_embed:
     embedding = model.encode(input, training = False)
     embedding = embedding.numpy()
@@ -104,13 +97,32 @@ for input, target, char_class in images_to_embed:
         embeddings = embedding.copy()
         classes = char_class.numpy().copy()
         first_embedding = False
+        embedding_1 = embedding[0].copy()
     else:
         embeddings = np.concatenate((embeddings, embedding), axis = 0)
         classes = np.concatenate((classes, char_class.numpy()), axis = 0)
+        if searching_second_embedding:
+            embedding_2 = embedding[0].copy()
+            searching_second_embedding = False
+
 embeddings = np.array(embeddings)
 embeddings = TSNE(n_components=2, learning_rate='auto', init='random').fit_transform(embeddings)
-plt.figure()
+plt.figure(figsize = (18,12))
+plt.suptitle("Latent Space")
 plt.scatter(embeddings[:,0], embeddings[:,1], c = classes, cmap = 'viridis')
 plt.colorbar()
+plt.show()
+
+plt.figure(figsize=(20,3))
+plt.suptitle("Interpolation between 2 embeddings")
+# plotting the recreations of two embeddings and their interpolations
+for index, i in enumerate(np.linspace(0,1,10)):
+    plt.subplot(1, 10, index+1);
+    interpolation = np.add((1.-i) * embedding_1, i * embedding_2)
+    interpolation = np.reshape(interpolation, (1,10))
+    reconstruction = model.decode(interpolation)
+    reconstruction = np.reshape(reconstruction, (28, 28))
+    plt.imshow(reconstruction)
+    plt.axis("off")
 plt.show()
 

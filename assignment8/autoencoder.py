@@ -26,7 +26,12 @@ class Autoencoder(K.Model):
         return x
 
     @tf.function
-    def encode(self, x, training):
+    def encode(self, x, training = False):
         x = self.encoder(x, training)
         x = self.bottleneck(x, training=training)
+        return x
+
+    @tf.function
+    def decode(self, x, training = False):
+        x = self.decoder(x, training = training)
         return x
