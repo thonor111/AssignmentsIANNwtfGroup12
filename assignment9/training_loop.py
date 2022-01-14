@@ -6,8 +6,8 @@ import numpy as np
 import tensorflow as tf
 
 
-def train_step(generator, discriminator, images, noise, loss_function, optimizer):
-  '''
+def train_step(generator, discriminator, images, noise, loss_function, optimizer_generator, optimizer_discriminator):
+    '''
     Performs the training step
 
     Args:
@@ -21,26 +21,27 @@ def train_step(generator, discriminator, images, noise, loss_function, optimizer
       loss: the loss of the current epoch
   '''
 
-  # loss_object and optimizer_object are instances of respective tensorflow classes
-  with tf.GradientTape() as generator_tape:
-    with tf.GradientTape() as discriminator_tape:
-      generation = generator(noise, training = True)
-      prediction_fake = discriminator(generation, training = True)
-      prediction_real = discriminator(images, training = True)
-      loss_discriminator_fake = loss_function(tf.zeros_like(prediction_fake), prediction_fake)
-      loss_discriminator_real = loss_function(tf.ones_like(prediction_real), prediction_real)
-      loss_discriminator = loss_discriminator_real + loss_discriminator_fake
-      loss_generator = loss_function(tf.ones_like(prediction_fake), prediction_fake)
-  gradients_discriminator = discriminator_tape.gradient(loss_discriminator, discriminator.trainable_variables)
-  gradients_generator = generator_tape.gradient(loss_generator, generator.trainable_variables)
+    # loss_object and optimizer_object are instances of respective tensorflow classes
+    with tf.GradientTape() as generator_tape:
+        with tf.GradientTape() as discriminator_tape:
+            generation = generator(noise, training=True)
+            prediction_fake = discriminator(generation, training=True)
+            prediction_real = discriminator(images, training=True)
+            loss_discriminator_fake = loss_function(tf.zeros_like(prediction_fake), prediction_fake)
+            loss_discriminator_real = loss_function(tf.ones_like(prediction_real), prediction_real)
+            loss_discriminator = loss_discriminator_real + loss_discriminator_fake
+            loss_generator = loss_function(tf.ones_like(prediction_fake), prediction_fake)
+    gradients_discriminator = discriminator_tape.gradient(loss_discriminator, discriminator.trainable_variables)
+    gradients_generator = generator_tape.gradient(loss_generator, generator.trainable_variables)
 
-  optimizer.apply_gradients(zip(gradients_discriminator, discriminator.trainable_variables))
-  optimizer.apply_gradients(zip(gradients_generator, generator.trainable_variables))
+    optimizer_discriminator.apply_gradients(zip(gradients_discriminator, discriminator.trainable_variables))
+    optimizer_generator.apply_gradients(zip(gradients_generator, generator.trainable_variables))
 
-  return loss_discriminator + loss_generator
+    return (loss_discriminator, loss_generator)
+
 
 def test(generator, discriminator, test_data, loss_function):
-  '''
+    '''
     Tests the model's performance and calculates loss and accuracy
 
     Args:
@@ -53,19 +54,21 @@ def test(generator, discriminator, test_data, loss_function):
       test_accuracy: model's accuracy on the test set
   '''
 
-  test_loss_aggregator = []
+    test_loss_aggregator_generator = []
+    test_loss_aggregator_discriminator = []
 
-  for (images, noise) in test_data:
-    generation = generator(noise, training=True)
-    prediction_fake = discriminator(generation, training=True)
-    prediction_real = discriminator(images, training=True)
-    loss_discriminator_fake = loss_function(tf.zeros_like(prediction_fake), prediction_fake)
-    loss_discriminator_real = loss_function(tf.ones_like(prediction_real), prediction_real)
-    loss_discriminator = loss_discriminator_real + loss_discriminator_fake
-    loss_generator = loss_function(tf.ones_like(prediction_fake), prediction_fake)
-    sample_test_loss = loss_discriminator + loss_generator
-    test_loss_aggregator.append(sample_test_loss.numpy())
+    for (images, noise) in test_data:
+        generation = generator(noise, training=True)
+        prediction_fake = discriminator(generation, training=True)
+        prediction_real = discriminator(images, training=True)
+        loss_discriminator_fake = loss_function(tf.zeros_like(prediction_fake), prediction_fake)
+        loss_discriminator_real = loss_function(tf.ones_like(prediction_real), prediction_real)
+        loss_discriminator = loss_discriminator_real + loss_discriminator_fake
+        loss_generator = loss_function(tf.ones_like(prediction_fake), prediction_fake)
+        test_loss_aggregator_generator.append(loss_generator.numpy())
+        test_loss_aggregator_discriminator.append(loss_discriminator.numpy())
 
-  test_loss = tf.reduce_mean(test_loss_aggregator)
+    test_loss_generator = tf.reduce_mean(test_loss_aggregator_generator)
+    test_loss_discriminator = tf.reduce_mean(test_loss_aggregator_discriminator)
 
-  return test_loss
+    return (test_loss_discriminator, test_loss_generator)

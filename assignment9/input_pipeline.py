@@ -21,14 +21,14 @@ def prepare_data(data):
     # convert data from uint8 to float32
     data = data.map(lambda img: tf.cast(img, tf.float32))
 
-    # image normalization [-1,1]
-    data = data.map(lambda img: img / 128 - 1)
+    # image normalization [0,1]
+    data = data.map(lambda img: img / 255)
 
     # reshaping
     data = data.map(lambda img: tf.reshape(img, (28,28,1)))
 
     # adding noise to the image
-    data = data.map(lambda img: (img, tf.random.uniform(shape=[100])))
+    data = data.map(lambda img: (img, tf.random.uniform(shape=[10])))
 
     # cache
     data = data.cache()

@@ -13,13 +13,13 @@ class Discriminator(K.Model):
         Initializes the discriminator
         '''
         super(Discriminator, self).__init__()
-        self.conv_1 = K.layers.Conv2DTranspose(filters=16, kernel_size=3, strides=1, padding="same", activation="relu")
+        self.conv_1 = K.layers.Conv2DTranspose(filters=16, kernel_size=4, strides=1, padding="same", activation="relu")
         self.batch_normalization_1 = K.layers.BatchNormalization()
         self.pooling_1 = K.layers.AveragePooling2D(pool_size = 2)
-        self.conv_2 = K.layers.Conv2DTranspose(filters=32, kernel_size=3, strides=1, padding="same", activation="relu")
+        self.conv_2 = K.layers.Conv2DTranspose(filters=32, kernel_size=4, strides=1, padding="same", activation="relu")
         self.batch_normalization_2 = K.layers.BatchNormalization()
         self.pooling_2 = K.layers.AveragePooling2D(pool_size=2)
-        self.conv_3 = K.layers.Conv2DTranspose(filters=64, kernel_size=3, strides=1, padding="same", activation="relu")
+        self.conv_3 = K.layers.Conv2DTranspose(filters=64, kernel_size=4, strides=1, padding="same", activation="relu")
         self.batch_normalization_3 = K.layers.BatchNormalization()
         self.pooling_3 = K.layers.AveragePooling2D(pool_size=2)
         self.global_pooling = K.layers.GlobalMaxPooling2D()

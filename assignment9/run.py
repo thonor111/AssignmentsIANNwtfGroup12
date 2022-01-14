@@ -25,14 +25,10 @@ if not os.path.exists(f'dataset/{category}.npy'):
     urllib.request.urlretrieve(url, f'dataset/{category}.npy')
 
 images = np.load(f'dataset/{category}.npy')
-print(f'{len(images)} images to train on')
 
 # You can limit the amount of images you use for training by setting :
 train_images = images[:10000]
 test_images = images[10000:11000]
-# plt.gray()
-# plt.imshow(train_images[0].reshape((28,28)))
-# plt.show()
 
 # create tf datasets
 train_data = tf.data.Dataset.from_tensor_slices(train_images)
@@ -44,7 +40,8 @@ test_data = test_data.apply(input_pipeline.prepare_data)
 
 # Hyperparameters
 num_epochs = 10
-alpha = 0.001
+alpha_generator = 0.002
+alpha_discriminator = 0.0002
 
 # Initialize Model
 generator = Generator()
@@ -54,20 +51,25 @@ discriminator = Discriminator()
 loss_function = K.losses.BinaryCrossentropy()
 
 # optimizer
-optimizer = K.optimizers.Adam(alpha)
+optimizer_generator = K.optimizers.Adam(alpha_generator)
+optimizer_discriminator = K.optimizers.Adam(alpha_discriminator)
 
 # initialize lists for later visualization.
-train_losses = []
-test_losses = []
+train_losses_discriminator = []
+test_losses_discriminator = []
+train_losses_generator = []
+test_losses_generator = []
 
 # testing once before we begin
-test_loss = training_loop.test(
+test_loss_discriminator, test_loss_generator = training_loop.test(
     generator, discriminator, test_data, loss_function)
-test_losses.append(test_loss)
+test_losses_discriminator.append(test_loss_discriminator)
+test_losses_generator.append(test_loss_generator)
 
 # check how model performs on train data once before we begin
-train_loss = training_loop.test(generator, discriminator, train_data, loss_function)
-train_losses.append(train_loss)
+train_loss_discriminator, train_loss_generator = training_loop.test(generator, discriminator, train_data, loss_function)
+train_losses_discriminator.append(train_loss_discriminator)
+train_losses_generator.append(train_loss_generator)
 
 # We train for num_epochs epochs.
 for epoch in range(num_epochs):
@@ -76,39 +78,50 @@ for epoch in range(num_epochs):
     plotting_examples = test_data.take(5)
     plot_number = 1
     plt.figure(figsize=(20, 5))
-    plt.suptitle(f"Epoch {epoch} with a starting test-loss of {test_losses[-1]}")
+    plt.suptitle(f"Epoch {epoch} with a starting generator-test-loss of {test_losses_generator[-1]} and a discriminator-test-loss of {test_losses_discriminator[-1]}")
     for image, noise in plotting_examples:
-        plt.subplot(1, 5, plot_number)
+        plt.subplot(2, 5, plot_number)
         plt.gray()
         plt.imshow(generator(noise).numpy()[0].reshape((28, 28)))
-        plt.title(f"Candle {plot_number}")
+        plt.title(f"Created candle {plot_number}")
+        plt.axis("off")
+        plt.subplot(2, 5, plot_number+5)
+        plt.gray()
+        plt.imshow(image.numpy()[0].reshape((28, 28)))
+        plt.title(f"Example candle {plot_number}")
         plt.axis("off")
         plot_number += 1
     plt.show()
 
 
     # training (and checking in with training)
-    epoch_losses = []
+    epoch_losses_discriminator = []
+    epoch_losses_generator = []
     for image, noise in train_data:
-        train_loss = training_loop.train_step(generator, discriminator, image, noise,
-                                              loss_function, optimizer)
-        epoch_losses.append(train_loss)
+        train_loss_discriminator, train_loss_generator = training_loop.train_step(generator, discriminator, image, noise,
+                                              loss_function, optimizer_generator, optimizer_discriminator)
+        epoch_losses_discriminator.append(train_loss_discriminator)
+        epoch_losses_generator.append(train_loss_generator)
 
     # track training loss
-    train_losses.append(tf.reduce_mean(epoch_losses))
+    train_losses_discriminator.append(tf.reduce_mean(epoch_losses_discriminator))
+    train_losses_generator.append(tf.reduce_mean(epoch_losses_generator))
 
     # testing, so we can track accuracy and test loss
-    test_loss = training_loop.test(generator, discriminator, test_data,
+    test_loss_discriminator, test_loss_generator = training_loop.test(generator, discriminator, test_data,
                                                     loss_function)
-    test_losses.append(test_loss)
+    test_losses_discriminator.append(test_loss_discriminator)
+    test_losses_generator.append(test_loss_generator)
 
 plt.figure()
-line1, = plt.plot(train_losses)
-line2, = plt.plot(test_losses)
+line1, = plt.plot(train_losses_discriminator)
+line2, = plt.plot(test_losses_discriminator)
+line3, = plt.plot(train_losses_generator)
+line4, = plt.plot(test_losses_generator)
 plt.xlabel("Epoch")
 plt.ylabel("Losses")
 plt.ylim(bottom = 0)
-plt.legend((line1,line2),("Train losses","Test losses"))
+plt.legend((line1,line2,line3,line4),("Train losses Discriminator","Test losses Discriminator","Train losses Generator","Test losses Generator"))
 plt.show()
 
 #
