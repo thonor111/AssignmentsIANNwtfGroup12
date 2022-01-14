@@ -24,7 +24,7 @@ class Generator(K.Model):
         self.trans_conv_4 = K.layers.Conv2DTranspose(filters=1, kernel_size=3, strides=1, padding="same",activation="sigmoid")
 
 
-    #@tf.function
+    @tf.function
     def call(self, inputs, training):
         x = self.dense(inputs, training=training)
         x = self.reshape(x, training=training)

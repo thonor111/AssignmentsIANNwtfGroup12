@@ -72,7 +72,20 @@ train_losses.append(train_loss)
 # We train for num_epochs epochs.
 for epoch in range(num_epochs):
 
-    print(f"Epoch {epoch} starting with a test Loss of {test_losses[-1]}")
+    # visualizing the generator
+    plotting_examples = test_data.take(5)
+    plot_number = 1
+    plt.figure(figsize=(20, 5))
+    plt.suptitle(f"Epoch {epoch} with a starting test-loss of {test_losses[-1]}")
+    for image, noise in plotting_examples:
+        plt.subplot(1, 5, plot_number)
+        plt.gray()
+        plt.imshow(generator(noise).numpy()[0].reshape((28, 28)))
+        plt.title(f"Candle {plot_number}")
+        plt.axis("off")
+        plot_number += 1
+    plt.show()
+
 
     # training (and checking in with training)
     epoch_losses = []
