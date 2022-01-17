@@ -27,8 +27,8 @@ def prepare_data(data):
     # reshaping
     data = data.map(lambda img: tf.reshape(img, (28,28,1)))
 
-    # adding noise to the image
-    data = data.map(lambda img: (img, tf.random.uniform(shape=[10])))
+    # adding noise as generator input
+    data = data.map(lambda img: (img, (tf.random.uniform(shape=[100]), tf.random.uniform(shape=[100]), tf.random.uniform(shape=[100]))))
 
     # cache
     data = data.cache()
@@ -37,7 +37,7 @@ def prepare_data(data):
     data = data.shuffle(1000, reshuffle_each_iteration = True, seed = 42)
 
     # batch
-    data = data.batch(64)
+    data = data.batch(32)
 
     # prefetch
     data = data.prefetch(20)

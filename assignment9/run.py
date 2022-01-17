@@ -40,8 +40,8 @@ test_data = test_data.apply(input_pipeline.prepare_data)
 
 # Hyperparameters
 num_epochs = 10
-alpha_generator = 0.002
-alpha_discriminator = 0.0002
+alpha_generator = 0.001
+alpha_discriminator = 0.001
 
 # Initialize Model
 generator = Generator()
@@ -75,19 +75,18 @@ train_losses_generator.append(train_loss_generator)
 for epoch in range(num_epochs):
 
     # visualizing the generator
-    plotting_examples = test_data.take(5)
-    plot_number = 1
+    (image, noises) = next(iter(test_data))
     plt.figure(figsize=(20, 5))
     plt.suptitle(f"Epoch {epoch} with a starting generator-test-loss of {test_losses_generator[-1]} and a discriminator-test-loss of {test_losses_discriminator[-1]}")
-    for image, noise in plotting_examples:
+    for plot_number in range(1,6):
         plt.subplot(2, 5, plot_number)
         plt.gray()
-        plt.imshow(generator(noise).numpy()[0].reshape((28, 28)))
+        plt.imshow(generator(noises[0]).numpy()[plot_number].reshape((28, 28)))
         plt.title(f"Created candle {plot_number}")
         plt.axis("off")
         plt.subplot(2, 5, plot_number+5)
         plt.gray()
-        plt.imshow(image.numpy()[0].reshape((28, 28)))
+        plt.imshow(image.numpy()[plot_number].reshape((28, 28)))
         plt.title(f"Example candle {plot_number}")
         plt.axis("off")
         plot_number += 1
@@ -97,11 +96,16 @@ for epoch in range(num_epochs):
     # training (and checking in with training)
     epoch_losses_discriminator = []
     epoch_losses_generator = []
-    for image, noise in train_data:
-        train_loss_discriminator, train_loss_generator = training_loop.train_step(generator, discriminator, image, noise,
+    for image, noises in train_data:
+        train_loss_discriminator, train_loss_generator = training_loop.train_step(generator, discriminator, image, noises,
                                               loss_function, optimizer_generator, optimizer_discriminator)
         epoch_losses_discriminator.append(train_loss_discriminator)
         epoch_losses_generator.append(train_loss_generator)
+
+    if epoch%2 == 0:
+        # training only the generator to avoid a loss close to zero of the discriminator (vanishing gradients)
+        for _, noises in train_data:
+            training_loop.train_step_generator(generator, discriminator, noises, loss_function, optimizer_generator)
 
     # track training loss
     train_losses_discriminator.append(tf.reduce_mean(epoch_losses_discriminator))
