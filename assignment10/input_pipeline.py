@@ -66,30 +66,35 @@ def prepare_data(text):
 
     print("finished Bool-map")
 
-    dataset_array = np.array([("","")] * np.sum(word_important) * 4)
-    elem_minus_one = ""
-    elem_minus_two = ""
-    elem_minus_three = ""
-    elem_minus_four = ""
+    dataset_array = np.zeros((np.sum(word_important) * 4, 2))
+    elem_minus_one = 0
+    elem_minus_two = 0
+    elem_minus_three = 0
+    elem_minus_four = 0
     j = 0
     for i, elem in enumerate(data):
+        current_index = int(np.where(elem.numpy() == words_sorted_shortened)[0])
         if i >= 2 and word_important[i-2]:
             if word_important[i]:
-                dataset_array[j] = (elem_minus_two, elem.numpy())
+                dataset_array[j,0] = elem_minus_two
+                dataset_array[j,1] = current_index
                 j += 1
             if i >= 1 and word_important[i-1]:
-                dataset_array[j] = (elem_minus_two, elem_minus_one)
+                dataset_array[j,0] = elem_minus_two
+                dataset_array[j,1] = elem_minus_one
                 j += 1
             if i >= 3 and word_important[i-3]:
-                dataset_array[j] = (elem_minus_two, elem_minus_three)
+                dataset_array[j,0] = elem_minus_two
+                dataset_array[j,1] = elem_minus_three
                 j += 1
             if i >= 4 and word_important[i-4]:
-                dataset_array[j] = (elem_minus_two, elem_minus_four)
+                dataset_array[j,0] = elem_minus_two
+                dataset_array[j,1] = elem_minus_four
                 j += 1
         elem_minus_four = elem_minus_three
         elem_minus_three = elem_minus_two
         elem_minus_two = elem_minus_one
-        elem_minus_one = elem.numpy()
+        elem_minus_one = current_index
 
     print(f"Created array, dataset_size = {dataset_array.shape}")
 
@@ -108,7 +113,7 @@ def prepare_data(text):
     #     data.skip(1)
     # dataset = tf.data.Dataset.from_tensor_slices(dataset_array)
 
-   # dataset = dataset.map(lambda element: (tf.one_hot(element[0], depth=number_words), tf.one_hot(element[1], depth=number_words)))
+    dataset = dataset.map(lambda element: (tf.one_hot(element[0], depth=number_words), tf.one_hot(element[1], depth=number_words)))
 
     # cache
     dataset = dataset.cache()
