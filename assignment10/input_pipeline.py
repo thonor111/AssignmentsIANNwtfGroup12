@@ -32,7 +32,7 @@ def prepare_data(text):
     mask_to_be_excluded = tf.logical_not(mask_to_be_excluded)
     data = tf.boolean_mask(data, mask_to_be_excluded)
     data_len = data.shape[0]
-    data = tf.data.Dataset.from_tensor_slices(data)
+    # data = tf.data.Dataset.from_tensor_slices(data)
 
     # getting the counts of the different words
     first_elem = True
@@ -57,28 +57,36 @@ def prepare_data(text):
     words_sorted = words[sort_indices]
     # only taking the 10000 most common words
     words_sorted_shortened = words_sorted[:10000]
-    data_important = data.map(lambda word: (word, np.isin(word.numpy(), words_sorted_shortened)))
 
+    print("finished counting")
+
+    word_important = np.array([False] * data.shape[0])
+    for i, elem in enumerate(data):
+        word_important[i] = np.isin(elem.numpy(), words_sorted_shortened)
+
+    print("finished Bool-map")
 
     dataset_array = np.array([])
-    elem_minus_one = ("", False)
-    elem_minus_two = ("", False)
-    elem_minus_three = ("", False)
-    elem_minus_four = ("", False)
-    for elem, elem_important in data:
-        if elem_minus_two[1]:
-            if elem_important:
-                np.append(dataset_array, (elem_minus_two[0], elem.numpy()))
-            if elem_minus_one[1]:
-                np.append(dataset_array, (elem_minus_two[0], elem_minus_one))
-            if elem_minus_three[1]:
-                np.append(dataset_array, (elem_minus_two[0], elem_minus_three))
-            if elem_minus_four[1]:
-                np.append(dataset_array, (elem_minus_two[0], elem_minus_four))
+    elem_minus_one = ""
+    elem_minus_two = ""
+    elem_minus_three = ""
+    elem_minus_four = ""
+    for i, elem in enumerate(data):
+        if i >= 2 and word_important[i-2]:
+            if word_important[i]:
+                np.append(dataset_array, (elem_minus_two, elem.numpy()))
+            if i >= 1 and word_important[i-1]:
+                np.append(dataset_array, (elem_minus_two, elem_minus_one))
+            if i >= 3 and word_important[i-3]:
+                np.append(dataset_array, (elem_minus_two, elem_minus_three))
+            if i >= 4 and word_important[i-4]:
+                np.append(dataset_array, (elem_minus_two, elem_minus_four))
         elem_minus_four = elem_minus_three
         elem_minus_three = elem_minus_two
         elem_minus_two = elem_minus_one
-        elem_minus_one = (elem.numpy(), elem_important)
+        elem_minus_one = elem.numpy()
+
+    print("Created array")
 
     dataset = tf.data.Dataset.from_tensor_slices(dataset_array)
     #
