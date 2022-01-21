@@ -6,7 +6,7 @@ import tensorflow as tf
 import tensorflow_text as tf_txt
 import numpy as np
 
-noise_strength = 0.2
+number_words = 10000
 
 def prepare_data(text):
     '''
@@ -56,7 +56,7 @@ def prepare_data(text):
     words = counts[:,0]
     words_sorted = words[sort_indices]
     # only taking the 10000 most common words
-    words_sorted_shortened = words_sorted[:10000]
+    words_sorted_shortened = words_sorted[:number_words]
 
     print("finished counting")
 
@@ -66,27 +66,32 @@ def prepare_data(text):
 
     print("finished Bool-map")
 
-    dataset_array = np.array([])
+    dataset_array = np.array([("","")] * np.sum(word_important) * 4)
     elem_minus_one = ""
     elem_minus_two = ""
     elem_minus_three = ""
     elem_minus_four = ""
+    j = 0
     for i, elem in enumerate(data):
         if i >= 2 and word_important[i-2]:
             if word_important[i]:
-                np.append(dataset_array, (elem_minus_two, elem.numpy()))
+                dataset_array[j] = (elem_minus_two, elem.numpy())
+                j += 1
             if i >= 1 and word_important[i-1]:
-                np.append(dataset_array, (elem_minus_two, elem_minus_one))
+                dataset_array[j] = (elem_minus_two, elem_minus_one)
+                j += 1
             if i >= 3 and word_important[i-3]:
-                np.append(dataset_array, (elem_minus_two, elem_minus_three))
+                dataset_array[j] = (elem_minus_two, elem_minus_three)
+                j += 1
             if i >= 4 and word_important[i-4]:
-                np.append(dataset_array, (elem_minus_two, elem_minus_four))
+                dataset_array[j] = (elem_minus_two, elem_minus_four)
+                j += 1
         elem_minus_four = elem_minus_three
         elem_minus_three = elem_minus_two
         elem_minus_two = elem_minus_one
         elem_minus_one = elem.numpy()
 
-    print("Created array")
+    print(f"Created array, dataset_size = {dataset_array.shape}")
 
     dataset = tf.data.Dataset.from_tensor_slices(dataset_array)
     #
@@ -102,6 +107,8 @@ def prepare_data(text):
     #                 np.append(dataset_array, (words[2],words[j]))
     #     data.skip(1)
     # dataset = tf.data.Dataset.from_tensor_slices(dataset_array)
+
+   # dataset = dataset.map(lambda element: (tf.one_hot(element[0], depth=number_words), tf.one_hot(element[1], depth=number_words)))
 
     # cache
     dataset = dataset.cache()

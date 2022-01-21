@@ -17,6 +17,7 @@ with open('dataset/bible.txt') as file:
 
 data = input_pipeline.prepare_data(data)
 print(data)
+print(next(iter(data)))
 #
 # # prepare data
 # data = data.apply(input_pipeline.prepare_data)
