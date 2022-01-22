@@ -16,7 +16,7 @@ with open('dataset/bible.txt') as file:
 num_epochs = 10
 alpha = 0.1
 embedding_dimensions = 64
-number_vocabulary = 100000
+number_vocabulary = 5000
 
 input_pipeline = InputPipeline(data, number_vocabulary=number_vocabulary)
 train_data = input_pipeline.prepare_data(data)

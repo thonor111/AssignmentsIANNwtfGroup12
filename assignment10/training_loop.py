@@ -28,7 +28,7 @@ def train_step(model, input, target, optimizer, number_vocabulary = 10000):
         nce_biases = tf.Variable(tf.zeros([number_vocabulary]))
         loss = tf.nn.nce_loss(weights=model.get_weights(), biases=nce_biases, labels=target, inputs=embedding,
                               num_sampled=1, num_classes=number_vocabulary, num_true=1)
-        #print(f"loss: {loss}, averaged loss: {np.mean(loss)}")
+        # print(f"loss: {loss}, averaged loss: {np.mean(loss)}")
         loss = tf.reduce_mean(loss)
     gradients = tape.gradient(loss, model.trainable_variables)
 

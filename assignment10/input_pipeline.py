@@ -103,7 +103,7 @@ class InputPipeline:
         dataset = dataset.shuffle(1000, reshuffle_each_iteration = True, seed = 42)
 
         # batch
-        dataset = dataset.batch(32)
+        dataset = dataset.batch(128)
 
         # prefetch
         dataset = dataset.prefetch(20)
@@ -137,7 +137,8 @@ class InputPipeline:
         for i, elem in enumerate(data):
             current_index = np.where(elem.numpy() == self.words_sorted_shortened)[0]
             if word_important[i]:
-                dataset_array[i] = current_index
+                dataset_array[j] = current_index
+                j += 1
 
         # create dataset from array
         dataset = tf.data.Dataset.from_tensor_slices(dataset_array)
@@ -161,7 +162,7 @@ class InputPipeline:
         data = tokenizer.tokenize(text)
 
         # removing new line, digits, dots, commas, colons
-        mask_to_be_excluded = tf.strings.regex_full_match(data, ".*(\.+|[\d]+|\n+|,+|:+|;+|\'+).*")
+        mask_to_be_excluded = tf.strings.regex_full_match(data, ".*(\.+|[\d]+|\n+|,+|:+|;+|\'+|\?+|!+).*")
         mask_to_be_excluded = tf.logical_not(mask_to_be_excluded)
         data = tf.boolean_mask(data, mask_to_be_excluded)
 
