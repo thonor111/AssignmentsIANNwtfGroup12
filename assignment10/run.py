@@ -8,16 +8,22 @@ import tensorflow.keras as K
 import matplotlib.pyplot as plt
 import tensorflow_datasets as tfds
 from sklearn.manifold import TSNE
-import input_pipeline
+from input_pipeline import InputPipeline
 import training_loop
 import tensorflow_text as tf_txt
 
 with open('dataset/bible.txt') as file:
     data = file.read()
 
-data = input_pipeline.prepare_data(data)
-print(data)
-print(next(iter(data)))
+input_pipeline = InputPipeline(data)
+# data = input_pipeline.prepare_data(data)
+# print("IN RUN")
+# # print(data)
+# print(next(iter(data)))
+
+test_data = input_pipeline.prepare_data_testing("he unto to")
+print(test_data)
+print(next(iter(test_data)))
 #
 # # prepare data
 # data = data.apply(input_pipeline.prepare_data)
