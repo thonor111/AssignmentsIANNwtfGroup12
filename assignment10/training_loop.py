@@ -1,12 +1,12 @@
 '''
-authors: tnortmann, hsanna, lmcdonald
+authors: tnortmann, lmcdonald
 '''
 
 import numpy as np
 import tensorflow as tf
 
 
-def train_step(model, input, target, optimizer):
+def train_step(model, input, target, optimizer, number_vocabulary = 10000):
     '''
     Performs the training step
 
@@ -25,9 +25,9 @@ def train_step(model, input, target, optimizer):
     with tf.GradientTape() as tape:
         embedding = model(input)
         target = tf.reshape(target, (target.shape[0], 1))
-        nce_biases = tf.Variable(tf.zeros([1000]))
+        nce_biases = tf.Variable(tf.zeros([number_vocabulary]))
         loss = tf.nn.nce_loss(weights=model.get_weights(), biases=nce_biases, labels=target, inputs=embedding,
-                              num_sampled=1, num_classes=1000, num_true=1)
+                              num_sampled=1, num_classes=number_vocabulary, num_true=1)
         #print(f"loss: {loss}, averaged loss: {np.mean(loss)}")
         loss = tf.reduce_mean(loss)
     gradients = tape.gradient(loss, model.trainable_variables)
