@@ -5,8 +5,9 @@ authors: tnortmann, hsanna, lmcdonald
 import numpy as np
 import tensorflow as tf
 
-def train_step(model, input, target, loss_function, optimizer):
-  '''
+
+def train_step(model, input, target, optimizer):
+    '''
     Performs the training step
 
     Args:
@@ -20,18 +21,25 @@ def train_step(model, input, target, loss_function, optimizer):
       loss: the loss of the current epoch
   '''
 
-  # loss_object and optimizer_object are instances of respective tensorflow classes
-  with tf.GradientTape() as tape:
-    prediction = model(input, training = True)
-    loss = loss_function(target, prediction)
-  gradients = tape.gradient(loss, model.trainable_variables)
+    # loss_object and optimizer_object are instances of respective tensorflow classes
+    with tf.GradientTape() as tape:
+        embedding = model(input)
+        target = tf.argmax(target, axis=1)
+        target = tf.reshape(target, (target.shape[0], 1))
+        nce_biases = tf.Variable(tf.zeros([1000]))
+        loss = tf.nn.nce_loss(weights=model.get_weights(), biases=nce_biases, labels=target, inputs=embedding,
+                              num_sampled=1, num_classes=1000, num_true=1)
+        #print(f"loss: {loss}, averaged loss: {np.mean(loss)}")
+        loss = tf.reduce_mean(loss)
+    gradients = tape.gradient(loss, model.trainable_variables)
 
-  optimizer.apply_gradients(zip(gradients, model.trainable_variables))
+    optimizer.apply_gradients(zip(gradients, model.trainable_variables))
 
-  return loss
+    return loss
+
 
 def test(model, test_data, loss_function):
-  '''
+    '''
     Tests the model's performance and calculates loss and accuracy
 
     Args:
@@ -44,18 +52,18 @@ def test(model, test_data, loss_function):
       test_accuracy: model's accuracy on the test set
   '''
 
-  test_accuracy_aggregator = []
-  test_loss_aggregator = []
+    test_accuracy_aggregator = []
+    test_loss_aggregator = []
 
-  for (input, target, char_class) in test_data:
-    prediction = model(input, training = False)
-    sample_test_loss = loss_function(target, prediction)
-    sample_test_accuracy =  tf.math.abs(tf.math.subtract(target, tf.math.round(prediction)))
-    sample_test_accuracy = 1 - tf.reduce_mean(sample_test_accuracy)
-    test_loss_aggregator.append(sample_test_loss.numpy())
-    test_accuracy_aggregator.append(np.mean(sample_test_accuracy))
+    for (input, target, char_class) in test_data:
+        prediction = model(input, training=False)
+        sample_test_loss = loss_function(target, prediction)
+        sample_test_accuracy = tf.math.abs(tf.math.subtract(target, tf.math.round(prediction)))
+        sample_test_accuracy = 1 - tf.reduce_mean(sample_test_accuracy)
+        test_loss_aggregator.append(sample_test_loss.numpy())
+        test_accuracy_aggregator.append(np.mean(sample_test_accuracy))
 
-  test_loss = tf.reduce_mean(test_loss_aggregator)
-  test_accuracy = tf.reduce_mean(test_accuracy_aggregator)
+    test_loss = tf.reduce_mean(test_loss_aggregator)
+    test_accuracy = tf.reduce_mean(test_accuracy_aggregator)
 
-  return test_loss, test_accuracy
+    return test_loss, test_accuracy

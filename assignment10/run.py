@@ -11,40 +11,37 @@ from sklearn.manifold import TSNE
 from input_pipeline import InputPipeline
 import training_loop
 import tensorflow_text as tf_txt
+from skip_gram import SkipGram
 
 with open('dataset/bible.txt') as file:
     data = file.read()
 
-input_pipeline = InputPipeline(data)
-# data = input_pipeline.prepare_data(data)
+# Hyperparameters
+num_epochs = 10
+alpha = 0.1
+embedding_dimensions = 64
+number_vocabulary = 1000
+
+input_pipeline = InputPipeline(data, number_vocabulary=number_vocabulary)
+train_data = input_pipeline.prepare_data(data)
 # print("IN RUN")
 # # print(data)
 # print(next(iter(data)))
 
-test_data = input_pipeline.prepare_data_testing("he unto to")
-print(test_data)
-print(next(iter(test_data)))
-#
-# # prepare data
-# data = data.apply(input_pipeline.prepare_data)
-# # test_data = test_data.apply(input_pipeline.prepare_data)
-#
-# # Hyperparameters
-# num_epochs = 10
-# alpha = 0.001
-# embedding_dimensions = 64
+test_data = input_pipeline.prepare_data_testing("to unto in brought his he")
+# print(test_data)
+# print(next(iter(test_data)))
+print("Created Dataset, start training")
 
-# # Initialize Model
-# model = Autoencoder(embedding_dimensions)
-#
-# # loss function
-# loss_function = K.losses.MeanSquaredError()
-#
-# # optimizer
-# optimizer = K.optimizers.Adam(alpha)
-#
+# Initialize Model
+model = SkipGram(embedding_dimensions=embedding_dimensions, number_vocabulary=number_vocabulary)
+
+
+# optimizer
+optimizer = K.optimizers.SGD(alpha)
+
 # # initialize lists for later visualization.
-# train_losses = []
+train_losses = []
 # valid_losses = []
 # valid_accuracies = []
 #
@@ -58,8 +55,8 @@ print(next(iter(test_data)))
 # train_loss, _ = training_loop.test(model, train_data, loss_function)
 # train_losses.append(train_loss)
 #
-# # We train for num_epochs epochs.
-# for epoch in range(num_epochs):
+# We train for num_epochs epochs.
+for epoch in range(num_epochs):
 #
 #     # plotting some testing examples to visualize the learning
 #     plotting_examples = test_data.take(5)
@@ -80,14 +77,15 @@ print(next(iter(test_data)))
 #     plt.show()
 #
 #     # training (and checking in with training)
-#     epoch_losses = []
-#     for input, target, char_class in train_data:
-#         train_loss = training_loop.train_step(model, input, target,
-#                                               loss_function, optimizer)
-#         epoch_losses.append(train_loss)
-#
-#     # track training loss
-#     train_losses.append(tf.reduce_mean(epoch_losses))
+    epoch_losses = []
+    for input, target in train_data:
+        train_loss = training_loop.train_step(model, input, target, optimizer)
+        epoch_losses.append(train_loss)
+
+
+    # track training loss
+    train_losses.append(tf.reduce_mean(epoch_losses))
+    print(f"epoch {epoch} finished with loss of {train_losses[-1]}")
 #
 #     # testing, so we can track accuracy and test loss
 #     valid_loss, valid_accuracy = training_loop.test(model, test_data,

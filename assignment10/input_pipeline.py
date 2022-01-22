@@ -9,8 +9,8 @@ import numpy as np
 
 class InputPipeline:
 
-    def __init__(self, text):
-        self.number_words = 1000
+    def __init__(self, text, number_vocabulary = 10000):
+        self.number_words = number_vocabulary
 
         data = self.create_data(text)
 
@@ -37,8 +37,6 @@ class InputPipeline:
         words_sorted = words[sort_indices]
         # only taking the 10000 most common words
         self.words_sorted_shortened = words_sorted[:self.number_words]
-        print(self.words_sorted_shortened[:6])
-        # print("finished counting")
 
     def prepare_data(self, text):
         '''
@@ -93,8 +91,6 @@ class InputPipeline:
             elem_minus_one = current_index
 
         print(f"Created array, dataset_size = {dataset_array.shape}")
-        print(dataset_array)
-
         # create dataset from array
         dataset = tf.data.Dataset.from_tensor_slices(dataset_array)
 
@@ -102,7 +98,7 @@ class InputPipeline:
         dataset = dataset.map(lambda element: (tf.cast(element[0], tf.int32), tf.cast(element[0], tf.int32)))
 
         # create one-hot encodings
-        dataset = dataset.map(lambda word, target: (tf.one_hot(word, depth=self.number_words), tf.one_hot(target, depth=self.number_words)))
+        dataset = dataset.map(lambda word, target: (tf.one_hot(word, depth=self.number_words, dtype=tf.int32), tf.one_hot(target, depth=self.number_words, dtype=tf.int32)))
 
         # cache
         dataset = dataset.cache()
@@ -111,7 +107,7 @@ class InputPipeline:
         dataset = dataset.shuffle(1000, reshuffle_each_iteration = True, seed = 42)
 
         # batch
-        dataset = dataset.batch(64)
+        dataset = dataset.batch(32)
 
         # prefetch
         dataset = dataset.prefetch(20)
