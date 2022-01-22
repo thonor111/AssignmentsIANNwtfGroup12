@@ -97,9 +97,6 @@ class InputPipeline:
         # change the dataset entries to int
         dataset = dataset.map(lambda element: (tf.cast(element[0], tf.int32), tf.cast(element[0], tf.int32)))
 
-        # create one-hot encodings
-        dataset = dataset.map(lambda word, target: (tf.one_hot(word, depth=self.number_words, dtype=tf.int32), tf.one_hot(target, depth=self.number_words, dtype=tf.int32)))
-
         # cache
         dataset = dataset.cache()
 
@@ -151,9 +148,6 @@ class InputPipeline:
 
         # change the dataset entries to int
         dataset = dataset.map(lambda element: tf.cast(element, tf.int32))
-
-        # create one-hot encodings
-        dataset = dataset.map(lambda word: tf.one_hot(word, depth=self.number_words))
 
         # cache
         dataset = dataset.cache()

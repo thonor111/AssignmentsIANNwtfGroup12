@@ -57,26 +57,7 @@ train_losses = []
 #
 # We train for num_epochs epochs.
 for epoch in range(num_epochs):
-#
-#     # plotting some testing examples to visualize the learning
-#     plotting_examples = test_data.take(5)
-#     plot_number = 1
-#     plt.figure(figsize=(20,5))
-#     plt.suptitle(f"Epoch {epoch} with starting-accuracy {valid_accuracies[-1]}")
-#     for input, target, char_class in plotting_examples:
-#         plt.gray()
-#         plt.subplot(2, 5, plot_number);
-#         plt.imshow(input.numpy()[0].reshape((28,28)))
-#         plt.title("Input")
-#         plt.axis("off")
-#         plt.subplot(2, 5, plot_number + 5);
-#         plt.imshow(model(input).numpy()[0].reshape((28,28)))
-#         plt.title("Reconstruction")
-#         plt.axis("off")
-#         plot_number += 1
-#     plt.show()
-#
-#     # training (and checking in with training)
+    # training (and checking in with training)
     epoch_losses = []
     for input, target in train_data:
         train_loss = training_loop.train_step(model, input, target, optimizer)
@@ -86,6 +67,20 @@ for epoch in range(num_epochs):
     # track training loss
     train_losses.append(tf.reduce_mean(epoch_losses))
     print(f"epoch {epoch} finished with loss of {train_losses[-1]}")
+
+    embeddings = model.embedding_matrix.numpy()
+    smallest_loss = 2
+    cosine_loss = tf.keras.losses.CosineSimilarity(axis=0)
+    best_match = ""
+    for elem in test_data:
+        embedding_elem = model(elem)
+        for i in range(embeddings.shape[0]):
+            embedding = tf.nn.embedding_lookup(embeddings, i)
+            if cosine_loss(embedding_elem, embedding) < smallest_loss:
+                smallest_loss = cosine_loss(embedding_elem, embedding)
+                best_match = input_pipeline.words_sorted_shortened[i]
+        elem_string = input_pipeline.words_sorted_shortened[elem.numpy()]
+        print(f"The most similar element to {elem_string} is {best_match}")
 #
 #     # testing, so we can track accuracy and test loss
 #     valid_loss, valid_accuracy = training_loop.test(model, test_data,

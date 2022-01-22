@@ -24,7 +24,6 @@ def train_step(model, input, target, optimizer):
     # loss_object and optimizer_object are instances of respective tensorflow classes
     with tf.GradientTape() as tape:
         embedding = model(input)
-        target = tf.argmax(target, axis=1)
         target = tf.reshape(target, (target.shape[0], 1))
         nce_biases = tf.Variable(tf.zeros([1000]))
         loss = tf.nn.nce_loss(weights=model.get_weights(), biases=nce_biases, labels=target, inputs=embedding,

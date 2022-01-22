@@ -18,6 +18,5 @@ class SkipGram(K.layers.Layer):
         #                                     dtype="float32")
 
     def call(self, inputs):
-        ids = tf.argmax(inputs, axis=1)
-        embedding = tf.nn.embedding_lookup(self.embedding_matrix, ids)
+        embedding = tf.nn.embedding_lookup(self.embedding_matrix, inputs)
         return embedding
