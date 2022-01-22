@@ -1,4 +1,3 @@
-import numpy as np
 import tensorflow.keras as K
 import tensorflow as tf
 
@@ -13,9 +12,6 @@ class SkipGram(K.layers.Layer):
         self.embedding_matrix = self.add_weight('embedding_matrix', (self.number_vocabulary, self.embedding_dimensions),
                                                 trainable=True, initializer="random_normal",
                                                 dtype="float32")
-        # self.score_matrix = self.add_weight('embedding_matrix', (self.embedding_dimensions, self.number_vocabulary),
-        #                                     trainable=True, initializer="random_normal",
-        #                                     dtype="float32")
 
     def call(self, inputs):
         embedding = tf.nn.embedding_lookup(self.embedding_matrix, inputs)

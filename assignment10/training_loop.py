@@ -35,34 +35,3 @@ def train_step(model, input, target, optimizer, number_vocabulary = 10000):
     optimizer.apply_gradients(zip(gradients, model.trainable_variables))
 
     return loss
-
-
-def test(model, test_data, loss_function):
-    '''
-    Tests the model's performance and calculates loss and accuracy
-
-    Args:
-      model: the model in question
-      test_data: the test split of the dataset
-      loss_function: the loss function to be used
-
-    Returns:
-      test_loss: model's loss on the test set
-      test_accuracy: model's accuracy on the test set
-  '''
-
-    test_accuracy_aggregator = []
-    test_loss_aggregator = []
-
-    for (input, target, char_class) in test_data:
-        prediction = model(input, training=False)
-        sample_test_loss = loss_function(target, prediction)
-        sample_test_accuracy = tf.math.abs(tf.math.subtract(target, tf.math.round(prediction)))
-        sample_test_accuracy = 1 - tf.reduce_mean(sample_test_accuracy)
-        test_loss_aggregator.append(sample_test_loss.numpy())
-        test_accuracy_aggregator.append(np.mean(sample_test_accuracy))
-
-    test_loss = tf.reduce_mean(test_loss_aggregator)
-    test_accuracy = tf.reduce_mean(test_accuracy_aggregator)
-
-    return test_loss, test_accuracy
