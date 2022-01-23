@@ -5,24 +5,93 @@ authors: tnortmann, lmcdonald
 import tensorflow as tf
 import numpy as np
 import tensorflow.keras as K
-from input_pipeline import InputPipeline
+import input_pipeline
 import training_loop
 from skip_gram import SkipGram
-
-with open('dataset/bible.txt') as file:
-    data = file.read()
+import re
+import nltk
+nltk.download("punkt")
 
 # Hyperparameters
 num_epochs = 10
 alpha = 0.1
 embedding_dimensions = 64
-number_vocabulary = 5000
+number_vocabulary = 10000
 
-input_pipeline = InputPipeline(data, number_vocabulary=number_vocabulary)
-train_data = input_pipeline.prepare_data(data)
+# pre-process text
+def clean_text(text):
+  text = text.lower()
+  text = re.sub(r'\n', " ", text)
+  text = re.sub(r'[^\w\s]', "", text)
+  text = re.sub(r'\d+', "", text)
+  return text
 
-test_data = input_pipeline.prepare_data_testing("holy father wine poison love strong day")
-print("Created Dataset, start training")
+# tokenize
+def tokenize(text):
+  return nltk.word_tokenize(text)
+
+# only use num most frequent words
+def get_most_frequent(tokens, num):
+  fdist = nltk.FreqDist(tokens)
+  return fdist.most_common(num)
+
+def create_vocab(most_frequent):
+  vocab = {}
+  for i, token in enumerate(most_frequent):
+    vocab.update({token[0]:i})
+
+  return vocab
+
+def invert_vocab(vocab):
+  inverse = {}
+
+  for key, value in vocab.items():
+    inverse.update({value:key})
+
+  return inverse
+
+def tokens_to_ints(tokens, vocab):
+
+  int_tokens = []
+
+  for token in tokens:
+    if token in vocab:
+      int_tokens.append(vocab.get(token))
+
+  return int_tokens
+
+# read in file
+bible_text = ""
+with open("dataset/bible.txt") as f:
+  bible_text = f.read()
+
+# preprocessing
+bible_text_clean = clean_text(bible_text)
+bible_tokens = tokenize(bible_text_clean)
+bible_tokens_most_frequent = get_most_frequent(bible_tokens, num=number_vocabulary)
+bible_vocab = create_vocab(bible_tokens_most_frequent)
+bible_vocab_inverse = invert_vocab(bible_vocab)
+
+bible_integer_tokens = tokens_to_ints(bible_tokens, bible_vocab)
+
+# create dataset
+def generator():
+
+  for input, target in input_pipeline.skip_gram_generator(bible_integer_tokens, bible_vocab_inverse, window_size=4):
+    yield input, target
+
+data = tf.data.Dataset.from_generator(
+    generator,
+    output_signature=(
+        tf.TensorSpec(shape=(), dtype=tf.int64),
+        tf.TensorSpec(shape=(), dtype=tf.int64))
+    )
+
+train_data = data.apply(input_pipeline.prepare_data)
+
+test_tokens = tokens_to_ints(["holy", "father", "wine", "poison", "love", "strong", "day"], bible_vocab)
+test_data = tf.data.Dataset.from_tensor_slices(test_tokens)
+test_data = test_data.apply(input_pipeline.prepare_data_test)
 
 # Initialize Model
 model = SkipGram(embedding_dimensions=embedding_dimensions, number_vocabulary=number_vocabulary)
@@ -61,8 +130,8 @@ for epoch in range(num_epochs):
         indices = indices[:k]
         best_matches = ""
         for j in range(k):
-            best_matches += str(input_pipeline.words_sorted_shortened[indices[j]]) + " "
-        elem_string = input_pipeline.words_sorted_shortened[elem.numpy()]
+            best_matches += str(bible_vocab_inverse.get(indices[j])) + " "
+        elem_string = bible_vocab_inverse.get(elem.numpy())
         print(f"The most similar elements to {elem_string} are {best_matches}")
 
 

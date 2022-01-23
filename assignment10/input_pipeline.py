@@ -1,169 +1,54 @@
-'''
-authors: tnortmann, lmcdonald
-'''
-
 import tensorflow as tf
-import tensorflow_text as tf_txt
-import numpy as np
 
+def skip_gram_generator(all_tokens, vocab, window_size):
 
-class InputPipeline:
+  for i, token in enumerate(all_tokens):
+    if token in vocab:
+      j = - int(window_size/2)
+      while j <= int(window_size/2):
+        if j != 0 and i + j in range(len(all_tokens)):
+          yield token, all_tokens[i + j]
+        j+= 1
 
-    def __init__(self, text, number_vocabulary = 10000):
-        self.number_words = number_vocabulary
+def prepare_data(data):
+    '''
+        Prepares a tf dataset by converting categorical features into one-hot features
+        Caches, shuffles, batches and prefetches data
+        Args:
+            data: tf dataset
+        Returns:
+            data: the prepared tf dataset
+    '''
 
-        data = self.create_data(text)
+    data = data.map(lambda input, target: (tf.cast(input, tf.int64), tf.cast(target, tf.int64)))
 
-        # getting the counts of the different words
-        first_elem = True
-        for elem in data:
-            if not first_elem:
-                position = np.argwhere(counts[:, 0] == elem.numpy())
-                if position.shape == (1, 1):
-                    count = counts[position[0, 0], 1]
-                    count = int(count) + 1
-                    counts[position[0, 0], 1] = count
-                else:
-                    counts = np.concatenate((counts, [[elem.numpy(), 1]]), axis=0)
-            else:
-                counts = np.array([[elem.numpy(), 1]])
-                first_elem = False
+    # shuffle
+    data = data.shuffle(1000, reshuffle_each_iteration = True, seed = 42)
 
-        # sorting by the counts
-        sort_indices = np.argsort(counts[:, 1])
-        # inverting to have the most common on top
-        sort_indices = np.flip(sort_indices)
-        words = counts[:, 0]
-        words_sorted = words[sort_indices]
-        # only taking the 10000 most common words
-        self.words_sorted_shortened = words_sorted[:self.number_words]
+    # batch
+    data = data.batch(64)
 
-    def prepare_data(self, text):
-        '''
-            Prepares a tf dataset by converting categorical features into one-hot features
-            Caches, shuffles, batches and prefetches data
+    # prefetch
+    data = data.prefetch(20)
 
-            Args:
-                text: string
-                training: bool
+    return data
 
-            Returns:
-                data: the prepared tf dataset
-        '''
-        data = self.create_data(text)
+def prepare_data_test(data):
+    '''
+        Prepares a tf dataset by converting categorical features into one-hot features
+        Caches, shuffles, batches and prefetches data
+        Args:
+            data: tf dataset
+        Returns:
+            data: the prepared tf dataset
+    '''
 
-        # create a bool.map if a word is one of the important words
-        word_important = np.array([False] * data.shape[0])
-        for i, elem in enumerate(data):
-            word_important[i] = np.isin(elem.numpy(), self.words_sorted_shortened)
+    data = data.map(lambda input: tf.cast(input, tf.int64))
 
-        # print("finished Bool-map")
+    # shuffle
+    data = data.shuffle(1000, reshuffle_each_iteration = True, seed = 42)
 
-        # create array of tuples of important elements in context-window of size 4
-        dataset_array = np.zeros((np.sum(word_important) * 4, 2))
-        elem_minus_one = 0
-        elem_minus_two = 0
-        elem_minus_three = 0
-        elem_minus_four = 0
-        j = 0
-        for i, elem in enumerate(data):
-            current_index = np.where(elem.numpy() == self.words_sorted_shortened)[0]
-            if i >= 2 and word_important[i-2]:
-                if word_important[i]:
-                    dataset_array[j,0] = elem_minus_two
-                    dataset_array[j,1] = current_index
-                    j += 1
-                if i >= 1 and word_important[i-1]:
-                    dataset_array[j,0] = elem_minus_two
-                    dataset_array[j,1] = elem_minus_one
-                    j += 1
-                if i >= 3 and word_important[i-3]:
-                    dataset_array[j,0] = elem_minus_two
-                    dataset_array[j,1] = elem_minus_three
-                    j += 1
-                if i >= 4 and word_important[i-4]:
-                    dataset_array[j,0] = elem_minus_two
-                    dataset_array[j,1] = elem_minus_four
-                    j += 1
-            elem_minus_four = elem_minus_three
-            elem_minus_three = elem_minus_two
-            elem_minus_two = elem_minus_one
-            elem_minus_one = current_index
+    # prefetch
+    data = data.prefetch(20)
 
-        # create dataset from array
-        dataset = tf.data.Dataset.from_tensor_slices(dataset_array)
-
-        # change the dataset entries to int
-        dataset = dataset.map(lambda element: (tf.cast(element[0], tf.int32), tf.cast(element[0], tf.int32)))
-
-        # cache
-        dataset = dataset.cache()
-
-        # shuffle
-        dataset = dataset.shuffle(1000, reshuffle_each_iteration = True, seed = 42)
-
-        # batch
-        dataset = dataset.batch(128)
-
-        # prefetch
-        dataset = dataset.prefetch(20)
-
-        return dataset
-
-    def prepare_data_testing(self, text):
-        '''
-            Prepares a tf dataset by converting categorical features into one-hot features
-            Caches, shuffles, batches and prefetches data
-
-            Args:
-                text: string
-                training: bool
-
-            Returns:
-                data: the prepared tf dataset
-        '''
-        data = self.create_data(text)
-
-        # create a bool.map if a word is one of the important words
-        word_important = np.array([False] * data.shape[0])
-        for i, elem in enumerate(data):
-            word_important[i] = np.isin(elem.numpy(), self.words_sorted_shortened)
-
-        # print("finished Bool-map")
-
-        # create array of tuples of important elements in context-window of size 4
-        dataset_array = np.zeros(np.sum(word_important))
-        j = 0
-        for i, elem in enumerate(data):
-            current_index = np.where(elem.numpy() == self.words_sorted_shortened)[0]
-            if word_important[i]:
-                dataset_array[j] = current_index
-                j += 1
-
-        # create dataset from array
-        dataset = tf.data.Dataset.from_tensor_slices(dataset_array)
-
-        # change the dataset entries to int
-        dataset = dataset.map(lambda element: tf.cast(element, tf.int32))
-
-        # cache
-        dataset = dataset.cache()
-
-        # prefetch
-        dataset = dataset.prefetch(20)
-
-        return dataset
-
-    def create_data(self, text):
-        text = text.lower()
-
-        # creating word tokens
-        tokenizer = tf_txt.UnicodeScriptTokenizer()
-        data = tokenizer.tokenize(text)
-
-        # removing new line, digits, dots, commas, colons
-        mask_to_be_excluded = tf.strings.regex_full_match(data, ".*(\.+|[\d]+|\n+|,+|:+|;+|\'+|\?+|!+).*")
-        mask_to_be_excluded = tf.logical_not(mask_to_be_excluded)
-        data = tf.boolean_mask(data, mask_to_be_excluded)
-
-        return data
+    return data
